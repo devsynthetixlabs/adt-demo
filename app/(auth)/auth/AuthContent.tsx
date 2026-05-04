@@ -77,7 +77,13 @@ export default function AuthPage() {
       setError(result.error || "Signup failed.");
       return;
     }
-    setSuccessMessage(`Confirmation email sent to ${email}. Please check your inbox and verify your email before signing in.`);
+    setFullName("");
+    setEmail("");
+    setPassword("");
+    setPhone("");
+    setFirmName("");
+    setSuccessMessage("Account created successfully. Please log in to continue.");
+    setMode("signin");
   }
 
   async function onSignin(e: React.FormEvent) {
