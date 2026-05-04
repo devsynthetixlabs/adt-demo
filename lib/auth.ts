@@ -43,6 +43,27 @@ export async function signupUser({
   return { success: true };
 }
 
+export async function ensureProfile(): Promise<void> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) return;
+
+  const { data: existing } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", session.user.id)
+    .maybeSingle();
+
+  if (existing) return;
+
+  await supabase.from("profiles").insert({
+    id: session.user.id,
+    full_name: session.user.user_metadata?.full_name || session.user.email || "User",
+    role: session.user.user_metadata?.role || "owner",
+    firm_name: session.user.user_metadata?.firm_name,
+    phone: session.user.phone,
+  });
+}
+
 export async function signinUser(
   email: string,
   password: string
@@ -53,8 +74,13 @@ export async function signinUser(
   });
 
   if (error) {
+    if (error.message.includes("Email not confirmed")) {
+      return { success: false, error: "Please confirm your email first. Check your inbox." };
+    }
     return { success: false, error: error.message };
   }
+
+  await ensureProfile();
 
   return { success: true };
 }
@@ -83,17 +109,13 @@ export async function verifyPhoneOTP(
   if (error) return { success: false, error: error.message };
 
   if (data.user && options) {
-    const existing = await getProfile(data.user.id);
-    if (!existing) {
-      const { error: insertError } = await supabase.from("profiles").insert({
-        id: data.user.id,
-        full_name: options.fullName || "",
-        role: options.role || "contractor",
-        firm_name: options.firmName,
-        phone: formattedPhone,
-      });
-      if (insertError) return { success: false, error: "Account created but profile setup failed. Please try again." };
-    }
+    await supabase.from("profiles").upsert({
+      id: data.user.id,
+      full_name: options.fullName || "",
+      role: options.role || "contractor",
+      firm_name: options.firmName,
+      phone: formattedPhone,
+    });
   }
 
   return { success: true };
@@ -103,8 +125,13 @@ export async function getCurrentSession(): Promise<AuthSession | null> {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.user) return null;
 
-  const profile = await getProfile(session.user.id);
-  if (!profile) return null;
+  let profile = await getProfile(session.user.id);
+  
+  if (!profile) {
+    await ensureProfile();
+    profile = await getProfile(session.user.id);
+    if (!profile) return null;
+  }
 
   return {
     userId: session.user.id,
@@ -150,7 +177,12 @@ export async function getServerSession(cookieHeader: string | null): Promise<Aut
     const { data: { session } } = await supabaseServer.auth.getSession();
     if (!session?.user) return null;
 
-    const profile = await getProfile(session.user.id);
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", session.user.id)
+      .maybeSingle();
+
     if (!profile) return null;
 
     return {

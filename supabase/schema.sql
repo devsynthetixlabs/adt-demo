@@ -14,20 +14,29 @@ create table profiles (
 );
 
 -- Auto-create profile on signup
-create or replace function handle_new_user()
-returns trigger as $$
+create function handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
 begin
-  insert into profiles (id, full_name, role, firm_name, phone)
+  insert into public.profiles (id, full_name, role, firm_name, phone)
   values (
     new.id,
-    new.raw_user_meta_data->>'full_name',
-    new.raw_user_meta_data->>'role',
-    new.raw_user_meta_data->>'firm_name',
-    new.raw_user_meta_data->>'phone'
+    coalesce(
+      new.raw_user_meta_data->>'full_name',
+      new.raw_user_meta_data->>'name',
+      split_part(new.email, '@', 1),
+      'User'
+    ),
+    coalesce(nullif(new.raw_user_meta_data->>'role', ''), 'owner'),
+    nullif(new.raw_user_meta_data->>'firm_name', ''),
+    nullif(new.raw_user_meta_data->>'phone', '')
   );
   return new;
 end;
-$$ language plpgsql security definer;
+$$;
 
 create trigger on_auth_user_created
   after insert on auth.users
