@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { getCurrentSession, signoutUser } from "@/lib/auth";
-import Admin from "@/components/screens/admin";
+import TaskSheet from "@/components/screens/dashboard/TaskSheet";
 
 // ─── Types ───
 interface Task {
@@ -299,7 +299,6 @@ export default function DashboardPage() {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [notesTab, setNotesTab] = useState<"notes" | "guidelines">("notes");
   const [actionSubtab, setActionSubtab] = useState<"reminders" | "snags">("reminders");
-  const [adminSubtab, setAdminSubtab] = useState<"units" | "assignees" | "projects" | "settings">("projects");
   const [drawFilterUnit, setDrawFilterUnit] = useState("");
   const [drawFilterType, setDrawFilterType] = useState("");
   const [matFilterStatus, setMatFilterStatus] = useState("");
@@ -314,12 +313,14 @@ export default function DashboardPage() {
   const [apprFilterType, setApprFilterType] = useState("");
   const [apprFilterStatus, setApprFilterStatus] = useState("");
   const [apprFilterUnit, setApprFilterUnit] = useState("");
+  const [adminSubtab, setAdminSubtab] = useState<"units" | "assignees" | "projects" | "settings">("units");
   const [toast, setToast] = useState("");
   const [taskForm, setTaskForm] = useState({ desc: "", unit: "", room: "", assignee: "", start: "", end: "", status: "Pending", notes: "" });
   const [activeCommsChannel, setActiveCommsChannel] = useState("general");
   const [commsMsgInput, setCommsMsgInput] = useState("");
   const [taskViewMode, setTaskViewMode] = useState<"grouped" | "flat">("flat");
   const ddRef = useRef<HTMLDivElement>(null);
+  const commsMsgEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function checkSession() {
@@ -346,6 +347,13 @@ export default function DashboardPage() {
   }, [toast]);
 
   const project = projects[activeProjectId];
+
+  useEffect(() => {
+    if (project) {
+      commsMsgEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [project?.commsMessages[activeCommsChannel], project]);
+
   if (!project || !session) return null;
 
   const units = Object.keys(project.units);
@@ -547,64 +555,79 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F5F2]">
-      {/* HEADER */}
-      <header className="sticky top-0 z-100 bg-white border-b-2 border-[#E8601C] shadow-[0_2px_16px_rgba(232,96,28,0.08)] h-16 px-6 sm:px-8 flex items-center justify-between">
-        <div className="font-serif text-[1.5rem] font-semibold tracking-[0.1em] text-[#E8601C]">
-          ANANTAM<span className="text-[#2C2420] font-light"> · SITE</span>
-        </div>
+       {/* HEADER */}
+       <header className="sticky top-0 z-100 bg-white border-b-2 border-[#E8601C] shadow-[0_2px_16px_rgba(232,96,28,0.08)] h-16 px-6 sm:px-8 flex items-center justify-between">
+         <div className="flex items-center gap-6">
+           <div className="font-serif text-[1.5rem] font-semibold tracking-[0.1em] text-[#E8601C]">
+             ANANTAM<span className="text-[#2C2420] font-light"> · SITE</span>
+           </div>
 
-        <div ref={ddRef} className="relative">
-          <button
-            onClick={() => setShowProjectDropdown(!showProjectDropdown)}
-            className="flex items-center gap-2.5 bg-[#FEF4EF] border-[1.5px] border-[#F4895A] rounded-[10px] px-3.5 py-2 text-[0.85rem] font-semibold text-[#2C2420] transition-all hover:bg-[#FDE8DC] hover:border-[#E8601C] min-w-[200px]"
-          >
-            <span className="text-[0.9rem]">{project.icon}</span>
-            <span className="flex-1 text-left truncate">{project.name}</span>
-            <span className="text-[0.7rem] text-[#E8601C] transition-transform">{showProjectDropdown ? "▲" : "▼"}</span>
-          </button>
-          {showProjectDropdown && (
-            <div className="absolute top-full left-0 right-0 bg-white rounded-[10px] border border-[#E2DAD1] shadow-[0_8px_32px_rgba(44,36,32,0.15)] mt-1.5 p-1 z-200 max-h-[400px] overflow-y-auto">
-              {Object.values(projects).map((p) => (
-                <div
-                  key={p.id}
-                  onClick={() => switchProject(p.id)}
-                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-[7px] cursor-pointer transition-all ${p.id === activeProjectId ? "bg-[#FDE8DC]" : "hover:bg-[#FEF4EF]"}`}
-                >
-                  <span className="text-[1.1rem]">{p.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-[0.84rem] text-[#2C2420]">{p.name}</div>
-                    <div className="text-[0.7rem] text-[#9C8E86]">{p.client} · {p.address}</div>
-                  </div>
-                  {p.id === activeProjectId && <span className="text-[#E8601C] font-bold">✓</span>}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+           <div ref={ddRef} className="relative">
+             <button
+               onClick={() => setShowProjectDropdown(!showProjectDropdown)}
+               className="flex items-center gap-2.5 bg-[#FEF4EF] border-[1.5px] border-[#F4895A] rounded-[10px] px-3.5 py-2 text-[0.85rem] font-semibold text-[#2C2420] transition-all hover:bg-[#FDE8DC] hover:border-[#E8601C] min-w-[200px]"
+             >
+               <span className="text-[0.9rem]">{project.icon}</span>
+               <span className="flex-1 text-left truncate">{project.name}</span>
+               <span className="text-[0.7rem] text-[#E8601C] transition-transform">{showProjectDropdown ? "▲" : "▼"}</span>
+             </button>
+             {showProjectDropdown && (
+               <div className="absolute top-full left-0 right-0 bg-white rounded-[10px] border border-[#E2DAD1] shadow-[0_8px_32px_rgba(44,36,32,0.15)] mt-1.5 p-1 z-200 max-h-[400px] overflow-y-auto">
+                 {Object.values(projects).map((p) => (
+                   <div
+                     key={p.id}
+                     onClick={() => switchProject(p.id)}
+                     className={`flex items-center gap-2.5 px-3 py-2.5 rounded-[7px] cursor-pointer transition-all ${p.id === activeProjectId ? "bg-[#FDE8DC]" : "hover:bg-[#FEF4EF]"}`}
+                   >
+                     <span className="text-[1.1rem]">{p.icon}</span>
+                     <div className="flex-1 min-w-0">
+                       <div className="font-semibold text-[0.84rem] text-[#2C2420]">{p.name}</div>
+                       <div className="text-[0.7rem] text-[#9C8E86]">{p.client} · {p.address}</div>
+                     </div>
+                     {p.id === activeProjectId && <span className="text-[#E8601C] font-bold">✓</span>}
+                   </div>
+                 ))}
+               </div>
+             )}
+           </div>
+         </div>
 
-        <div className="flex items-center gap-5">
-          <span className="text-[0.75rem] text-[#9C8E86] tracking-[0.04em]">{dateStr}</span>
-          <div className="inline-flex items-center gap-1.5 bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-full px-3 py-[0.32rem] text-[0.74rem] font-semibold text-[#2C2420]">
-            <span className="text-[0.9rem]">{roleIcon}</span>
-            <span>{roleLabel}</span>
-          </div>
-          <button
-            onClick={() => setActiveTab("actions")}
-            className="bg-[#FDE8DC] border border-[#F4895A] text-[#E8601C] w-9 h-9 rounded-full flex items-center justify-center text-[0.9rem] relative transition-all hover:bg-[#E8601C] hover:text-white"
-          >
-            🔔
-            {overdueTasks > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-[#C0392B] text-white text-[0.6rem] w-3.5 h-3.5 rounded-full flex items-center justify-center">{overdueTasks}</span>
-            )}
-          </button>
-          <button
-            onClick={async () => { await signoutUser(); router.push("/auth"); }}
-            className="text-[0.78rem] text-[#9C8E86] font-medium hover:text-[#E8601C] transition-colors cursor-pointer"
-          >
-            Sign out
-          </button>
-        </div>
-      </header>
+         <div className="flex items-center gap-5">
+           <span className="text-[0.75rem] text-[#9C8E86] tracking-[0.04em]">{dateStr}</span>
+           <div className="inline-flex items-center gap-1.5 bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-full px-3 py-[0.32rem] text-[0.74rem] font-semibold text-[#2C2420]">
+             <span className="text-[0.9rem]">{roleIcon}</span>
+             <span>{roleLabel}</span>
+           </div>
+           <button
+             onClick={() => setActiveTab("actions")}
+             className="bg-[#FDE8DC] border border-[#F4895A] text-[#E8601C] w-9 h-9 rounded-full flex items-center justify-center text-[0.9rem] relative transition-all hover:bg-[#E8601C] hover:text-white"
+           >
+             🔔
+             {overdueTasks > 0 && (
+               <span className="absolute -top-0.5 -right-0.5 bg-[#C0392B] text-white text-[0.6rem] w-3.5 h-3.5 rounded-full flex items-center justify-center">{overdueTasks}</span>
+             )}
+           </button>
+           {session.role === "owner" && (
+             <button
+               onClick={() => setActiveTab("admin")}
+               className={`w-9 h-9 rounded-full flex items-center justify-center text-[0.9rem] transition-all cursor-pointer ${
+                 activeTab === "admin" 
+                   ? "bg-[#E8601C] text-white" 
+                   : "bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] text-[#9C8E86] hover:border-[#E8601C] hover:text-[#E8601C]"
+               }`}
+               title="Admin Panel"
+             >
+               ⚙
+             </button>
+           )}
+           <button
+             onClick={async () => { await signoutUser(); router.push("/auth"); }}
+             className="text-[0.78rem] text-[#9C8E86] font-medium hover:text-[#E8601C] transition-colors cursor-pointer"
+           >
+             Sign out
+           </button>
+         </div>
+       </header>
 
       {/* PROJECT BANNER */}
       <div className="bg-gradient-to-r from-[#2C2420] to-[#5C4F48] text-white px-6 sm:px-8 py-3.5 flex items-center justify-between flex-wrap gap-4 border-b-2 border-[#E8601C]">
@@ -624,222 +647,71 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* NAV TABS */}
-      <nav className="bg-white flex px-6 sm:px-8 gap-0 overflow-x-auto border-b border-[#E2DAD1] items-end">
-        <div className="flex gap-0">
-          {navTabs.filter((t) => !t.admin).map((t) => (
-            <button
-              key={t.key}
-              onClick={() => setActiveTab(t.key)}
-              className={`px-5 py-[0.85rem] text-[0.78rem] tracking-[0.08em] uppercase font-medium transition-all whitespace-nowrap border-b-2 mb-[-1px] cursor-pointer ${activeTab === t.key ? "text-[#E8601C] border-b-[#E8601C]" : "text-[#9C8E86] border-b-transparent hover:text-[#E8601C]"}`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-        <div className="flex-1" />
-        {session.role === "owner" && (
-          <button
-            onClick={() => setActiveTab("admin")}
-            className={`px-5 py-[0.85rem] text-[0.78rem] tracking-[0.08em] uppercase font-medium transition-all whitespace-nowrap border-b-2 mb-[-1px] cursor-pointer ${activeTab === "admin" ? "text-[#E8601C] border-b-[#E8601C]" : "text-[#9C8E86] border-b-transparent hover:text-[#E8601C]"}`}
-          >
-            ⚙ Admin
-          </button>
-        )}
-      </nav>
+       {/* NAV TABS */}
+       <nav className="bg-white flex px-6 sm:px-8 gap-0 overflow-x-auto border-b border-[#E2DAD1] items-end">
+         <div className="flex gap-0">
+           {navTabs.filter((t) => !t.admin).map((t) => (
+             <button
+               key={t.key}
+               onClick={() => setActiveTab(t.key)}
+               className={`px-5 py-[0.85rem] text-[0.78rem] tracking-[0.08em] uppercase font-medium transition-all whitespace-nowrap border-b-2 mb-[-1px] cursor-pointer ${activeTab === t.key ? "text-[#E8601C] border-b-[#E8601C]" : "text-[#9C8E86] border-b-transparent hover:text-[#E8601C]"}`}
+             >
+               {t.label}
+             </button>
+           ))}
+         </div>
+         <div className="flex-1" />
+         {session.role === "owner" && (
+           <button
+             key="admin"
+             onClick={() => setActiveTab("admin")}
+             className={`px-5 py-[0.85rem] text-[0.78rem] tracking-[0.08em] uppercase font-medium transition-all whitespace-nowrap border-b-2 mb-[-1px] cursor-pointer ${activeTab === "admin" ? "text-[#E8601C] border-b-[#E8601C]" : "text-[#9C8E86] border-b-transparent hover:text-[#E8601C]"}`}
+           >
+             ⚙ Admin
+           </button>
+         )}
+       </nav>
 
       {/* TAB CONTENT */}
       <div className="max-w-[1400px] mx-auto px-6 sm:px-8 py-8">
         {/* ═══ TASKS ═══ */}
         {activeTab === "tasks" && (
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
-            <div>
-              <div className="flex items-start justify-between flex-wrap gap-4 mb-7">
-                <div>
-                  <div className="font-serif text-[1.8rem] font-semibold text-[#2C2420]">Daily Task Sheets</div>
-                  <div className="text-[0.82rem] text-[#9C8E86] tracking-[0.03em]">Filter by unit · Add & track tasks</div>
-                </div>
-                <button onClick={() => setShowTaskModal(true)} className="bg-transparent text-[#E8601C] border-[1.5px] border-[#E8601C] rounded-lg px-4 py-2 text-[0.78rem] font-medium cursor-pointer transition-all hover:bg-[#E8601C] hover:text-white">
-                  + Add Task
-                </button>
-              </div>
-
-              {/* KPI Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                {[
-                  { label: "Total Tasks", num: totalTasks, color: "#E8601C", fill: 100 },
-                  { label: "Done", num: doneTasks, color: "#3D8A5F", fill: totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0 },
-                  { label: "In Progress", num: inProgressTasks, color: "#F4895A", fill: totalTasks > 0 ? Math.round((inProgressTasks / totalTasks) * 100) : 0 },
-                  { label: "Pending / Delayed", num: pendingTasks + delayedTasks, color: "#C0392B", fill: totalTasks > 0 ? Math.round(((pendingTasks + delayedTasks) / totalTasks) * 100) : 0 },
-                ].map((k) => (
-                  <div key={k.label} className="bg-white rounded-xl border border-[#E2DAD1] p-4 shadow-[0_2px_20px_rgba(44,36,32,0.07)]">
-                    <div className="font-serif text-[2.4rem] font-light leading-[1]" style={{ color: k.color }}>{k.num}</div>
-                    <div className="text-[0.72rem] text-[#9C8E86] tracking-[0.06em] uppercase mt-1">{k.label}</div>
-                    <div className="h-[3px] rounded-full bg-[#EEE9E3] overflow-hidden mt-3">
-                      <div className="h-full rounded-full transition-all" style={{ width: `${k.fill}%`, backgroundColor: k.color }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* View mode toggle */}
-              <div className="flex gap-1 mb-5 bg-white rounded-lg p-1 border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)]">
-                <button onClick={() => setTaskViewMode("flat")} className={`flex-1 py-2 rounded-md cursor-pointer transition-all text-[0.78rem] font-semibold ${taskViewMode === "flat" ? "bg-[#E8601C] text-white" : "text-[#9C8E86] hover:text-[#E8601C]"}`}>
-                  📋 All Tasks
-                </button>
-                <button onClick={() => setTaskViewMode("grouped")} className={`flex-1 py-2 rounded-md cursor-pointer transition-all text-[0.78rem] font-semibold ${taskViewMode === "grouped" ? "bg-[#E8601C] text-white" : "text-[#9C8E86] hover:text-[#E8601C]"}`}>
-                  🏠 By Room
-                </button>
-              </div>
-
-              {/* Filter bar */}
-              <div className="flex gap-3 flex-wrap mb-5 items-center">
-                <label className="text-[0.78rem] text-[#9C8E86] font-medium">Unit</label>
-                <select value={activeUnit} onChange={(e) => setActiveUnit(e.target.value)} className="w-auto px-2.5 py-1.5 text-[0.78rem] bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-lg text-[#2C2420] outline-none focus:border-[#E8601C] focus:bg-white">
-                  {allUnits.map((u) => <option key={u} value={u}>{u}</option>)}
-                </select>
-                <label className="text-[0.78rem] text-[#9C8E86] font-medium">Assignee</label>
-                <select value={filterAssignee} onChange={(e) => setFilterAssignee(e.target.value)} className="w-auto px-2.5 py-1.5 text-[0.78rem] bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-lg text-[#2C2420] outline-none focus:border-[#E8601C] focus:bg-white">
-                  <option value="">All</option>
-                  {assignees.map((a) => <option key={a} value={a}>{a}</option>)}
-                </select>
-                <label className="text-[0.78rem] text-[#9C8E86] font-medium">Status</label>
-                <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-auto px-2.5 py-1.5 text-[0.78rem] bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-lg text-[#2C2420] outline-none focus:border-[#E8601C] focus:bg-white">
-                  <option value="">All</option>
-                  {["Pending", "In Progress", "Done", "Delayed"].map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-                <label className="text-[0.78rem] text-[#9C8E86] font-medium">Date</label>
-                <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="w-auto px-2.5 py-1.5 text-[0.78rem] bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-lg text-[#2C2420] outline-none focus:border-[#E8601C] focus:bg-white" />
-              </div>
-
-              {/* FLAT TABLE VIEW */}
-              {taskViewMode === "flat" && (
-                <div className="bg-white rounded-xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-[0.82rem] border-collapse">
-                      <thead>
-                        <tr className="bg-[#E8601C] text-white">
-                          <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Task</th>
-                          <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Unit</th>
-                          <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Room</th>
-                          <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Assignee</th>
-                          <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Start</th>
-                          <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">End</th>
-                          <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Status</th>
-                          <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredTasks.map((t) => (
-                          <tr key={t.id} className="border-b border-[#E2DAD1] transition-all hover:bg-[#FEF4EF]">
-                            <td className="px-4 py-3 font-medium text-[#2C2420] max-w-[200px]">{t.desc}</td>
-                            <td className="px-4 py-3 text-[#5C4F48]">{t.unit}</td>
-                            <td className="px-4 py-3 text-[#5C4F48]">{t.room}</td>
-                            <td className="px-4 py-3">
-                              <span className="inline-flex items-center gap-1.5 bg-[#F7F5F2] rounded-full px-2.5 py-0.5 text-[0.72rem] text-[#5C4F48] border border-[#E2DAD1]">
-                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: project.assigneeProfiles[t.assignee]?.color || "#E8601C" }} />
-                                {t.assignee}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-[#5C4F48] whitespace-nowrap">{t.start}</td>
-                            <td className="px-4 py-3 text-[#5C4F48] whitespace-nowrap">{t.end || "—"}</td>
-                            <td className="px-4 py-3">
-                              {isContractor ? (
-                                <div className="flex gap-1.5 flex-wrap">
-                                  {["Pending", "In Progress", "Done"].map((s) => (
-                                    <button
-                                      key={s}
-                                      onClick={() => updateTaskStatus(t.id, s)}
-                                      className={`px-2.5 py-1 rounded-full text-[0.7rem] font-semibold cursor-pointer border-[1.5px] transition-all ${t.status === s ? s === "Done" ? "bg-[#E8F5EE] text-[#2A6045] border-[#A0CEB5]" : s === "In Progress" ? "bg-[#FDE8DC] text-[#C04E12] border-[#F4895A]" : "bg-[#EEE9E3] text-[#9C8E86] border-[#ccc]" : "bg-[#F7F5F2] text-[#9C8E86] border-[#E2DAD1]"}`}
-                                    >
-                                      {s}
-                                    </button>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className={`px-2.5 py-1 rounded-full text-[0.7rem] font-semibold tracking-[0.04em] ${statusClass(t.status)}`}>{t.status}</span>
-                              )}
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex gap-2">
-                                {session.role !== "contractor" && (
-                                  <button onClick={() => deleteTask(t.id)} className="text-[#9C8E86] text-[0.75rem] hover:text-[#C0392B] cursor-pointer transition-colors" title="Delete">✕</button>
-                                )}
-                                {isContractor && t.status !== "Done" && (
-                                  <button onClick={() => updateTaskStatus(t.id, "Done")} className="text-[#3D8A5F] text-[0.75rem] hover:text-[#2A6045] cursor-pointer transition-colors" title="Mark Done">✓</button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-              {/* GROUPED BY ROOM VIEW */}
-              {taskViewMode === "grouped" && (
-                <>
-                  {Object.entries(tasksByUnitRoom).map(([key, tasks]) => {
-                    const expanded = expandedRooms[key];
-                    const done = tasks.filter((t) => t.status === "Done").length;
-                    const prog = tasks.filter((t) => t.status === "In Progress").length;
-                    const late = tasks.filter((t) => t.status === "Delayed").length;
-                    return (
-                      <div key={key} className="bg-white rounded-[10px] border border-[#E2DAD1] mb-4 overflow-hidden shadow-[0_2px_20px_rgba(44,36,32,0.07)]">
-                        <div onClick={() => toggleRoom(key)} className="flex items-center justify-between px-5 py-4 bg-[#F7F5F2] cursor-pointer border-b border-[#E2DAD1] transition-all hover:bg-[#FEF4EF]">
-                          <span className="font-serif text-[1.1rem] font-semibold text-[#2C2420]">{key}</span>
-                          <div className="flex items-center gap-4">
-                            <div className="flex gap-3 text-[0.75rem] text-[#9C8E86]">
-                              {done > 0 && <span className="flex items-center gap-1"><span className="w-[6px] h-[6px] rounded-full bg-[#3D8A5F]" />{done} done</span>}
-                              {prog > 0 && <span className="flex items-center gap-1"><span className="w-[6px] h-[6px] rounded-full bg-[#E8601C]" />{prog} in progress</span>}
-                              {late > 0 && <span className="flex items-center gap-1"><span className="w-[6px] h-[6px] rounded-full bg-[#C0392B]" />{late} delayed</span>}
-                            </div>
-                            <span className={`text-[0.7rem] text-[#9C8E86] transition-transform ${expanded ? "rotate-180" : ""}`}>▼</span>
-                          </div>
-                        </div>
-                        {expanded && (
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-[0.82rem] border-collapse">
-                              <thead>
-                                <tr className="bg-[#E8601C] text-white">
-                                  <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Task</th>
-                                  <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Assignee</th>
-                                  <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Start</th>
-                                  <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">End</th>
-                                  <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Status</th>
-                                  <th className="px-4 py-3 text-left text-[0.72rem] tracking-[0.06em] uppercase font-medium">Action</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {tasks.map((t) => (
-                                  <tr key={t.id} className="border-b border-[#E2DAD1] transition-all hover:bg-[#FEF4EF]">
-                                    <td className="px-4 py-3 font-medium text-[#2C2420] max-w-[220px]">{t.desc}</td>
-                                    <td className="px-4 py-3">
-                                      <span className="inline-flex items-center gap-1.5 bg-[#F7F5F2] rounded-full px-2.5 py-0.5 text-[0.72rem] text-[#5C4F48] border border-[#E2DAD1]">
-                                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: project.assigneeProfiles[t.assignee]?.color || "#E8601C" }} />
-                                        {t.assignee}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-[#5C4F48] whitespace-nowrap">{t.start}</td>
-                                    <td className="px-4 py-3 text-[#5C4F48] whitespace-nowrap">{t.end || "—"}</td>
-                                    <td className="px-4 py-3">
-                                      {isContractor ? (
-                                        <div className="flex gap-1.5 flex-wrap">
-                                          {["Pending", "In Progress", "Done"].map((s) => (
-                                            <button
-                                              key={s}
-                                              onClick={() => updateTaskStatus(t.id, s)}
-                                              className={`px-2.5 py-1 rounded-full text-[0.7rem] font-semibold cursor-pointer border-[1.5px] transition-all ${t.status === s ? s === "Done" ? "bg-[#E8F5EE] text-[#2A6045] border-[#A0CEB5]" : s === "In Progress" ? "bg-[#FDE8DC] text-[#C04E12] border-[#F4895A]" : "bg-[#EEE9E3] text-[#9C8E86] border-[#ccc]" : "bg-[#F7F5F2] text-[#9C8E86] border-[#E2DAD1]"}`}
-                                            >
-                                              {s}
-                                            </button>
-                                          ))}
-                                        </div>
-                                      ) : (
-                                        <span className={`px-2.5 py-1 rounded-full text-[0.7rem] font-semibold tracking-[0.04em] ${statusClass(t.status)}`}>{t.status}</span>
-                                      )}
+          <TaskSheet 
+            project={project}
+            activeUnit={activeUnit}
+            setActiveUnit={setActiveUnit}
+            units={units}
+            allUnits={allUnits}
+            assignees={assignees}
+            filterAssignee={filterAssignee}
+            setFilterAssignee={setFilterAssignee}
+            filterStatus={filterStatus}
+            setFilterStatus={setFilterStatus}
+            filterDate={filterDate}
+            setFilterDate={setFilterDate}
+            taskViewMode={taskViewMode}
+            setTaskViewMode={setTaskViewMode}
+            filteredTasks={filteredTasks}
+            tasksByUnitRoom={tasksByUnitRoom}
+            expandedRooms={expandedRooms}
+            toggleRoom={toggleRoom}
+            isContractor={isContractor}
+            sessionRole={session.role}
+            deleteTask={deleteTask}
+            updateTaskStatus={updateTaskStatus}
+            statusClass={statusClass}
+            showTaskModal={showTaskModal}
+            setShowTaskModal={setShowTaskModal}
+            addTask={addTask}
+            taskForm={taskForm}
+            setTaskForm={setTaskForm}
+            totalTasks={totalTasks}
+            doneTasks={doneTasks}
+            inProgressTasks={inProgressTasks}
+            pendingTasks={pendingTasks}
+            TODAY={TODAY}
+          />
+        )}
                                     </td>
                                     <td className="px-4 py-3">
                                       <div className="flex gap-2">
@@ -1327,68 +1199,84 @@ export default function DashboardPage() {
                 <div className="text-[0.82rem] text-[#9C8E86]">Room channels · Photo sharing · Announcements</div>
               </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-0 rounded-xl overflow-hidden border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)]" style={{ height: "calc(100vh - 260px)" }}>
-              {/* Sidebar */}
-              <div className="bg-white border-r border-[#E2DAD1] overflow-y-auto">
+            <div className="flex flex-col lg:flex-row rounded-xl overflow-hidden border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)]" style={{ height: "calc(100vh - 260px)" }}>
+              {/* Sidebar - hidden on mobile */}
+              <div className="hidden lg:flex lg:w-[280px] lg:flex-shrink-0 bg-white border-r border-[#E2DAD1] flex-col">
                 <div className="flex items-center justify-between px-4 py-3 border-b border-[#E2DAD1] bg-[#F7F5F2]">
                   <span className="font-serif text-[1rem] font-semibold">Channels</span>
                   <span className="text-[0.7rem] text-[#9C8E86]">● 4 online</span>
                 </div>
-                {project.commsChannels.map((ch) => {
-                  const msgs = project.commsMessages[ch.id] || [];
-                  const last = msgs.length ? msgs[msgs.length - 1] : null;
-                  const unread = ch.id !== activeCommsChannel && msgs.length > 0 ? 0 : 0;
-                  return (
-                    <div
-                      key={ch.id}
-                      onClick={() => setActiveCommsChannel(ch.id)}
-                      className={`flex items-center gap-2.5 px-4 py-3 cursor-pointer border-b border-[#E2DAD1] transition-all ${activeCommsChannel === ch.id ? "bg-[#FEF4EF] border-l-[3px] border-l-[#E8601C]" : "hover:bg-[#FEF4EF]"}`}
-                    >
-                      <span className="text-[1rem]">{ch.icon}</span>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[0.82rem] font-semibold text-[#2C2420] truncate">{ch.name}</div>
-                        <div className="text-[0.7rem] text-[#9C8E86] truncate">{last ? last.text.slice(0, 30) + "…" : ch.sub}</div>
-                      </div>
-                      {unread > 0 && (
-                        <span className="bg-[#E8601C] text-white text-[0.6rem] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1 flex-shrink-0">{unread}</span>
-                      )}
-                    </div>
-                  );
-                })}
-                {/* Room channels */}
-                {units.map((u) =>
-                  project.units[u].map((r) => {
-                    const chId = "room-" + u.replace(/\s+/g, "-") + "-" + r.replace(/\s+/g, "-");
+                <div className="flex-1 overflow-y-auto">
+                  {project.commsChannels.map((ch) => {
+                    const msgs = project.commsMessages[ch.id] || [];
+                    const last = msgs.length ? msgs[msgs.length - 1] : null;
                     return (
                       <div
-                        key={chId}
-                        onClick={() => setActiveCommsChannel(chId)}
-                        className={`flex items-center gap-2.5 px-4 py-3 cursor-pointer border-b border-[#E2DAD1] transition-all ${activeCommsChannel === chId ? "bg-[#FEF4EF] border-l-[3px] border-l-[#E8601C]" : "hover:bg-[#FEF4EF]"}`}
+                        key={ch.id}
+                        onClick={() => setActiveCommsChannel(ch.id)}
+                        className={`flex items-center gap-2.5 px-4 py-3 cursor-pointer border-b border-[#E2DAD1] transition-all ${activeCommsChannel === ch.id ? "bg-[#FEF4EF] border-l-[3px] border-l-[#E8601C]" : "hover:bg-[#FEF4EF]"}`}
                       >
-                        <span className="text-[1rem]">🏠</span>
+                        <span className="text-[1rem]">{ch.icon}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="text-[0.82rem] font-semibold text-[#2C2420] truncate">{r}</div>
-                          <div className="text-[0.7rem] text-[#9C8E86] truncate">{u}</div>
+                          <div className="text-[0.82rem] font-semibold text-[#2C2420] truncate">{ch.name}</div>
+                          <div className="text-[0.7rem] text-[#9C8E86] truncate">{last ? last.text.slice(0, 30) + "…" : ch.sub}</div>
                         </div>
                       </div>
                     );
-                  })
-                )}
+                  })}
+                  {units.map((u) =>
+                    project.units[u].map((r) => {
+                      const chId = "room-" + u.replace(/\s+/g, "-") + "-" + r.replace(/\s+/g, "-");
+                      return (
+                        <div
+                          key={chId}
+                          onClick={() => setActiveCommsChannel(chId)}
+                          className={`flex items-center gap-2.5 px-4 py-3 cursor-pointer border-b border-[#E2DAD1] transition-all ${activeCommsChannel === chId ? "bg-[#FEF4EF] border-l-[3px] border-l-[#E8601C]" : "hover:bg-[#FEF4EF]"}`}
+                        >
+                          <span className="text-[1rem]">🏠</span>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-[0.82rem] font-semibold text-[#2C2420] truncate">{r}</div>
+                            <div className="text-[0.7rem] text-[#9C8E86] truncate">{u}</div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </div>
               {/* Main chat area */}
-              <div className="bg-[#F7F5F2] flex flex-col">
+              <div className="flex-1 flex flex-col min-w-0 h-full">
+                {/* Mobile channel selector */}
+                <div className="lg:hidden px-4 py-2 bg-white border-b border-[#E2DAD1]">
+                  <select
+                    value={activeCommsChannel}
+                    onChange={(e) => setActiveCommsChannel(e.target.value)}
+                    className="w-full px-3 py-2 text-[0.82rem] border border-[#E2DAD1] rounded-lg bg-[#F7F5F2] text-[#2C2420] outline-none"
+                  >
+                    {project.commsChannels.map((ch) => (
+                      <option key={ch.id} value={ch.id}>{ch.icon} {ch.name}</option>
+                    ))}
+                    {units.map((u) =>
+                      project.units[u].map((r) => {
+                        const chId = "room-" + u.replace(/\s+/g, "-") + "-" + r.replace(/\s+/g, "-");
+                        return <option key={chId} value={chId}>🏠 {r} ({u})</option>;
+                      })
+                    )}
+                  </select>
+                </div>
                 <div className="px-5 py-3.5 bg-white border-b border-[#E2DAD1]">
                   {(() => {
                     const ch = project.commsChannels.find((c) => c.id === activeCommsChannel);
+                    const isRoom = !ch && activeCommsChannel.startsWith("room-");
                     return (
                       <>
-                        <div className="font-semibold text-[0.9rem] text-[#2C2420]">{ch ? ch.name : activeCommsChannel}</div>
+                        <div className="font-semibold text-[0.9rem] text-[#2C2420]">{ch ? ch.name : (isRoom ? "🏠 " + activeCommsChannel.split("-").slice(2).join(" ") : activeCommsChannel)}</div>
                         <div className="text-[0.72rem] text-[#9C8E86]">{ch ? ch.sub : "Room channel"}</div>
                       </>
                     );
                   })()}
                 </div>
-                <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-3">
+                <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-3 bg-[#F7F5F2]">
                   {(project.commsMessages[activeCommsChannel] || []).length === 0 ? (
                     <div className="text-center text-[#9C8E86] text-[0.85rem] mt-20">
                       <div className="text-[2.5rem] mb-3 opacity-40">💬</div>
@@ -1413,6 +1301,7 @@ export default function DashboardPage() {
                           <div className={`text-[0.62rem] mt-1 text-right ${m.outgoing ? "text-white/65" : "text-[#9C8E86]"}`}>{m.time}</div>
                         </div>
                       ))}
+                      <div ref={commsMsgEndRef} />
                     </>
                   )}
                 </div>
@@ -1439,17 +1328,223 @@ export default function DashboardPage() {
         )}
 
         {/* ═══ ADMIN ═══ */}
-        {activeTab === "admin" && (
-          <Admin
-            projects={projects}
-            activeProjectId={activeProjectId}
-            sessionRole={session.role}
-            adminSubtab={adminSubtab}
-            setAdminSubtab={setAdminSubtab}
-            switchProject={switchProject}
-            project={project}
-          />
-        )}
+         {activeTab === "admin" && session.role === "owner" && (
+           <div>
+             {/* Admin Inner Tabs */}
+             <div className="flex gap-0 flex-wrap whitespace-nowrap border-b-2 border-[#E2DAD1] mb-6">
+               {(["units", "assignees", "projects", "settings"] as const).map((tab) => (
+                 <button
+                   key={tab}
+                   onClick={() => setAdminSubtab(tab)}
+                   className={`px-5 py-[0.75rem] text-[0.8rem] font-semibold tracking-[0.03em] uppercase cursor-pointer transition-all border-b-2 mb-[-2px] ${adminSubtab === tab ? "text-[#E8601C] border-b-[#E8601C]" : "text-[#9C8E86] border-b-transparent hover:text-[#E8601C]"}`}
+                 >
+                   {tab === "units" ? "🏠 Units & Rooms" : tab === "assignees" ? "👥 Assignees" : tab === "projects" ? "📂 Projects" : "⚙ Settings"}
+                 </button>
+               ))}
+             </div>
+
+             {/* PROJECT CONTEXT BANNER */}
+             <div className="bg-gradient-to-r from-[#2C2420] to-[#5C4F48] text-white px-5 py-3.5 flex items-center justify-between flex-wrap gap-4 rounded-[10px] mb-6 border-b-2 border-[#E8601C]">
+               <div className="flex items-center gap-3.5">
+                 <div className="w-[38px] h-[38px] rounded-[10px] bg-[#E8601C] flex items-center justify-center text-[1.1rem] flex-shrink-0">{project.icon}</div>
+                 <div>
+                   <div className="font-serif text-[1.2rem] font-semibold leading-[1.2]">{project.name}</div>
+                   <div className="text-[0.72rem] text-white/70">{project.client} · {project.address}</div>
+                 </div>
+               </div>
+               <div className="flex items-center gap-3 text-[0.72rem] text-white/85">
+                 <span>📋 {Object.keys(project.units).length} units</span>
+                 <span>👥 {Object.keys(project.assigneeProfiles).length} assignees</span>
+                 <span>📋 {project.tasks.length} tasks</span>
+               </div>
+             </div>
+
+             {/* UNITS & ROOMS TAB */}
+             {adminSubtab === "units" && (
+               <div className="bg-white rounded-xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden">
+                 <div className="flex items-center justify-between px-5 py-4 bg-[#F7F5F2] border-b border-[#E2DAD1]">
+                   <div className="font-serif text-[1.1rem] font-semibold text-[#2C2420]">Units & Rooms Management</div>
+                   <button className="bg-[#E8601C] text-white border-none rounded-lg px-4 py-2 text-[0.78rem] font-semibold cursor-pointer transition-all hover:bg-[#C04E12]">+ Add Unit</button>
+                 </div>
+                 {Object.entries(project.units).map(([unit, rooms]) => (
+                   <div key={unit} className="border-[1.5px] border-[#E2DAD1] rounded-lg mx-4 my-3 overflow-hidden">
+                     <div className="flex items-center justify-between px-4 py-3 bg-[#F7F5F2]">
+                       <div className="flex items-center gap-3">
+                         <span className="font-semibold text-[0.9rem] text-[#2C2420]">{unit}</span>
+                         <span className="bg-[#FDE8DC] text-[#C04E12] text-[0.65rem] font-bold px-2 py-0.5 rounded-full">{rooms.length} rooms</span>
+                       </div>
+                       <div className="flex gap-2">
+                         <button className="w-7 h-7 rounded-[6px] border border-[#E2DAD1] bg-white text-[#9C8E86] flex items-center justify-center cursor-pointer text-[0.75rem] transition-all hover:border-[#E8601C] hover:text-[#E8601C]">✎</button>
+                         <button className="w-7 h-7 rounded-[6px] border border-[#EDB9B9] bg-white text-[#9C8E86] flex items-center justify-center cursor-pointer text-[0.75rem] transition-all hover:border-[#C0392B] hover:text-[#C0392B]">✕</button>
+                       </div>
+                     </div>
+                     <div className="px-4 py-2">
+                       {rooms.map((room) => (
+                         <div key={room} className="flex items-center justify-between py-2 px-2 rounded-[6px] text-[0.82rem] text-[#5C4F48] transition-all hover:bg-[#FEF4EF]">
+                           <span className="flex items-center gap-2"><span className="text-[0.75rem] cursor-grab text-[#9C8E86]">⠿</span>{room}</span>
+                           <button className="w-6 h-6 rounded-[4px] border border-[#E2DAD1] bg-white text-[#9C8E86] flex items-center justify-center cursor-pointer text-[0.65rem] transition-all hover:border-[#E8601C] hover:text-[#E8601C]">✕</button>
+                         </div>
+                       ))}
+                     </div>
+                     <div className="flex gap-2 px-4 py-3 border-t border-[#E2DAD1] bg-[#F7F5F2]">
+                       <input placeholder="Add new room..." className="flex-1 px-3 py-1.5 text-[0.8rem] bg-white border-[1.5px] border-[#E2DAD1] rounded-[6px] outline-none focus:border-[#E8601C] focus:bg-white text-[#2C2420]" />
+                       <button className="bg-[#E8601C] text-white border-none rounded-[7px] px-3 py-1.5 text-[0.78rem] font-medium cursor-pointer transition-all hover:bg-[#C04E12]">+ Add</button>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             )}
+
+             {/* ASSIGNEES TAB */}
+             {adminSubtab === "assignees" && (
+               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                 <div className="bg-white rounded-xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden">
+                   <div className="flex items-center justify-between px-5 py-4 bg-[#F7F5F2] border-b border-[#E2DAD1]">
+                     <div>
+                       <div className="font-serif text-[1.1rem] font-semibold text-[#2C2420]">Assignees & Contractors</div>
+                       <div className="text-[0.72rem] text-[#9C8E86] mt-0.5">{Object.keys(project.assigneeProfiles).length} team members</div>
+                     </div>
+                     <button className="bg-[#E8601C] text-white border-none rounded-lg px-4 py-2 text-[0.78rem] font-semibold cursor-pointer transition-all hover:bg-[#C04E12]">+ Add Assignee</button>
+                   </div>
+                   <div className="p-4">
+                     {Object.entries(project.assigneeProfiles).map(([name, profile]) => {
+                       const aTasks = project.tasks.filter((t) => t.assignee === name);
+                       return (
+                         <div key={name} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border-[1.5px] border-[#E2DAD1] bg-[#F7F5F2] mb-2 last:mb-0 transition-all hover:border-[#F4895A]">
+                           <div
+                             className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[0.65rem] font-bold flex-shrink-0 cursor-pointer border-2 border-white shadow-[0_0_0_1.5px_rgba(44,36,32,0.15)] transition-all hover:shadow-[0_0_0_2px_#E8601C]"
+                             style={{ backgroundColor: profile.color }}
+                           />
+                           <div className="flex-1 min-w-0">
+                             <input
+                               value={name}
+                               onChange={(e) => {/* TODO: update assignee name */}}
+                               className="bg-transparent border-none outline-none text-[0.85rem] font-medium text-[#2C2420] w-full cursor-pointer hover:text-[#E8601C]"
+                             />
+                             <div className="flex gap-1.5 mt-0.5">
+                               <span className="bg-[#FDE8DC] text-[#C04E12] px-1.5 py-0.5 rounded-full text-[0.68rem] font-medium">{profile.role}</span>
+                               <span className="text-[0.68rem] text-[#9C8E86]">{aTasks.length} tasks</span>
+                             </div>
+                           </div>
+                           <div className="flex gap-2 flex-shrink-0">
+                             <span className="text-[0.68rem] text-[#9C8E86]">{profile.phone}</span>
+                             <button className="w-6 h-6 rounded-[4px] border border-[#E2DAD1] bg-white text-[#9C8E86] flex items-center justify-center cursor-pointer text-[0.65rem] transition-all hover:border-[#E8601C] hover:text-[#E8601C]">✎</button>
+                             <button className="w-6 h-6 rounded-[4px] border border-[#EDB9B9] bg-white text-[#9C8E86] flex items-center justify-center cursor-pointer text-[0.65rem] transition-all hover:border-[#C0392B] hover:text-[#C0392B]">✕</button>
+                           </div>
+                         </div>
+                       );
+                     })}
+                   </div>
+                 </div>
+
+                 {/* Visibility & Permissions */}
+                 <div className="bg-white rounded-xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden">
+                   <div className="px-5 py-4 bg-[#F7F5F2] border-b border-[#E2DAD1]">
+                     <div className="font-serif text-[1.1rem] font-semibold text-[#2C2420]">Visibility Settings</div>
+                     <div className="text-[0.72rem] text-[#9C8E86] mt-0.5">Control what each assignee can access</div>
+                   </div>
+                   <div className="p-4">
+                     {Object.entries(project.assigneeProfiles).map(([name, profile]) => (
+                       <div key={name} className="mb-4 last:mb-0">
+                         <div className="flex items-center gap-3 mb-2">
+                           <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[0.6rem] font-bold" style={{ backgroundColor: profile.color }}>{name.split(" ").map((w) => w[0]).join("").slice(0, 2)}</div>
+                           <span className="text-[0.82rem] font-medium text-[#2C2420]">{name}</span>
+                         </div>
+                         <div className="flex gap-2 flex-wrap ml-9">
+                           {["tasks", "reminders", "drawings", "approvals", "comms", "notes"].map((v) => (
+                             <button
+                               key={v}
+                               className={`px-2.5 py-0.5 rounded-full text-[0.68rem] font-medium cursor-pointer border transition-all ${profile.visibility.includes(v) ? "bg-[#FDE8DC] text-[#C04E12] border-[#F4895A]" : "bg-[#F7F5F2] text-[#9C8E86] border-[#E2DAD1] hover:border-[#E8601C]"}`}
+                             >
+                               {v}
+                             </button>
+                           ))}
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                 </div>
+               </div>
+             )}
+
+             {/* PROJECTS TAB */}
+             {adminSubtab === "projects" && (
+               <div>
+                 <div className="flex items-center justify-between mb-4">
+                   <div className="font-serif text-[1.4rem] font-semibold text-[#2C2420]">All Projects</div>
+                   <button className="bg-[#E8601C] text-white border-none rounded-lg px-4 py-2 text-[0.78rem] font-semibold cursor-pointer transition-all hover:bg-[#C04E12]">+ New Project</button>
+                 </div>
+                 {Object.values(projects).map((p) => (
+                   <div
+                     key={p.id}
+                     onClick={() => switchProject(p.id)}
+                     className={`flex items-center gap-4 px-5 py-4 mb-3 rounded-xl border-[1.5px] cursor-pointer transition-all shadow-[0_2px_20px_rgba(44,36,32,0.07)] ${p.id === activeProjectId ? "border-[#E8601C] bg-[#FEF4EF]" : "border-[#E2DAD1] bg-white hover:border-[#F4895A] hover:translate-x-0.5"}`}
+                   >
+                     <span className="text-[1.75rem]">{p.icon}</span>
+                     <div className="flex-1 min-w-0">
+                       <div className="font-bold text-[0.95rem] text-[#2C2420]">{p.name}</div>
+                       <div className="text-[0.75rem] text-[#9C8E86] mt-0.5">{p.client} · {p.address}</div>
+                       <div className="flex gap-2 flex-wrap mt-1.5">
+                         <span className="bg-[#F7F5F2] border border-[#E2DAD1] rounded-full px-2 py-0.5 text-[0.68rem] text-[#5C4F48]">{p.tasks.length} tasks</span>
+                         <span className="bg-[#F7F5F2] border border-[#E2DAD1] rounded-full px-2 py-0.5 text-[0.68rem] text-[#5C4F48]">{Object.keys(p.assigneeProfiles).length} assignees</span>
+                         <span className="bg-[#F7F5F2] border border-[#E2DAD1] rounded-full px-2 py-0.5 text-[0.68rem] text-[#5C4F48]">{Object.keys(p.units).length} units</span>
+                       </div>
+                     </div>
+                     {p.id === activeProjectId && <span className="bg-[#E8601C] text-white text-[0.65rem] font-bold px-2.5 py-0.5 rounded-full tracking-[0.05em]">ACTIVE</span>}
+                     <div className="flex gap-2 flex-shrink-0">
+                       <button className="w-8 h-8 rounded-[6px] border border-[#E2DAD1] bg-white text-[#9C8E86] flex items-center justify-center cursor-pointer text-[0.75rem] transition-all hover:border-[#E8601C] hover:text-[#E8601C]">✎</button>
+                       <button className="w-8 h-8 rounded-[6px] border border-[#EDB9B9] bg-white text-[#9C8E86] flex items-center justify-center cursor-pointer text-[0.75rem] transition-all hover:border-[#C0392B] hover:text-[#C0392B]">✕</button>
+                     </div>
+                   </div>
+                 ))}
+               </div>
+             )}
+
+             {/* SETTINGS TAB */}
+             {adminSubtab === "settings" && (
+               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                 <div className="bg-white rounded-xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden">
+                   <div className="px-5 py-4 bg-[#F7F5F2] border-b border-[#E2DAD1]">
+                     <div className="font-serif text-[1.1rem] font-semibold text-[#2C2420]">Project Settings</div>
+                   </div>
+                   <div className="divide-y divide-[#E2DAD1]">
+                     {[
+                       { label: "Project Name", value: project.name, type: "text" },
+                       { label: "Client Name", value: project.client, type: "text" },
+                       { label: "Address", value: project.address, type: "text" },
+                       { label: "Start Date", value: project.startDate, type: "date" },
+                       { label: "End Date", value: project.endDate, type: "date" },
+                     ].map((row, i) => (
+                       <div key={i} className="flex items-center justify-between px-5 py-3.5">
+                         <div>
+                           <div className="text-[0.85rem] font-semibold text-[#2C2420]">{row.label}</div>
+                         </div>
+                         <input
+                           type={row.type}
+                           value={row.value}
+                           className="w-auto px-3 py-1.5 text-[0.8rem] bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-lg text-[#2C2420] outline-none focus:border-[#E8601C] focus:bg-white"
+                         />
+                       </div>
+                     ))}
+                   </div>
+                 </div>
+
+                 <div className="bg-white rounded-xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden">
+                   <div className="px-5 py-4 bg-[#F7F5F2] border-b border-[#E2DAD1]">
+                     <div className="font-serif text-[1.1rem] font-semibold text-[#2C2420]">Danger Zone</div>
+                   </div>
+                   <div className="p-5">
+                     <div className="px-4 py-3.5 bg-[#FFF5F5] border-[1.5px] border-[#EDB9B9] rounded-lg mb-4">
+                       <div className="font-semibold text-[0.9rem] text-[#2C2420] mb-1">Delete Project</div>
+                       <div className="text-[0.75rem] text-[#9C8E86] leading-[1.5] mb-3">This action cannot be undone. This will permanently delete the project and all associated data.</div>
+                       <button className="bg-[#C0392B] text-white border-none rounded-[8px] px-4 py-2 text-[0.82rem] font-semibold cursor-pointer transition-all hover:bg-[#a33020]">Delete Project</button>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             )}
+           </div>
+         )}
       </div>
 
       {/* TASK MODAL */}
