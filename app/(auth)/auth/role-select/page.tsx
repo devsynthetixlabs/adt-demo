@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { updateUserRole, getProfile } from "@/lib/auth";
+import { useAuth } from "@/context/authProvider/provider";
 import { ROLE_OPTIONS, Role } from "@/types/auth";
 
 export default function RoleSelectPage() {
   const router = useRouter();
+  const { updateUserRole } = useAuth();
   const [selectedRole, setSelectedRole] = useState<Role>("owner");
+  const [firmName, setFirmName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [userName, setUserName] = useState("");
@@ -29,7 +31,25 @@ export default function RoleSelectPage() {
     setError("");
     setLoading(true);
 
-    const result = await updateUserRole(selectedRole);
+    // Validate firm name for owners
+    if (selectedRole === "owner" && !firmName.trim()) {
+      setError("Please enter your firm name.");
+      setLoading(false);
+      return;
+    }
+
+    console.log("Submitting role:", selectedRole, "firmName:", firmName, "userName:", userName);
+
+    // Call updateUserRole with correct argument order: (role, firstName, lastName, fullName, firmName)
+    const result = await updateUserRole(
+      selectedRole,
+      undefined, // firstName
+      undefined, // lastName
+      userName, // fullName
+      selectedRole === "owner" ? firmName : undefined
+    );
+
+    console.log("updateUserRole result:", result);
 
     if (!result.success) {
       setError(result.error || "Failed to save role. Please try again.");
@@ -37,6 +57,7 @@ export default function RoleSelectPage() {
       return;
     }
 
+    console.log("Role saved successfully, redirecting to dashboard...");
     router.push("/dashboard");
   }
 
@@ -101,7 +122,7 @@ export default function RoleSelectPage() {
                   type="button"
                   className={`relative border-[1.5px] rounded-[10px] p-4 text-left transition-all ${
                     selectedRole === option.key
-                      ? "border-[#E8601C] bg-[#FEF4EF] shadow-[0_0_0_3px_rgba(232,96,28,0.08)]"
+                      ? "border-[#E8601C] bg-[#FEF4EF] shadow-[0_0_3px_rgba(232,96,28,0.08)]"
                       : "border-[#E2DAD1] bg-white hover:border-[#F4895A]"
                   }`}
                   onClick={() => setSelectedRole(option.key as Role)}
@@ -120,6 +141,23 @@ export default function RoleSelectPage() {
                 </button>
               ))}
             </div>
+
+            {/* Firm name field for owners */}
+            {selectedRole === "owner" && (
+              <div className="mb-8">
+                <label className="block text-[0.82rem] font-medium text-[#2C2420] mb-2">
+                  Firm / company name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Anantam Designs"
+                  value={firmName}
+                  onChange={(e) => setFirmName(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border-[1.5px] border-[#E2DAD1] rounded-lg text-[0.88rem] text-[#2C2420] placeholder:text-[#9C8E86] focus:outline-none focus:border-[#E8601C] transition-colors"
+                  required
+                />
+              </div>
+            )}
 
             <button
               type="button"

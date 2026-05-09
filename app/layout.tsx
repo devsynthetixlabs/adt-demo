@@ -1,7 +1,10 @@
+import React from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/context/queryProvider/provider";
+import { AuthProvider } from "@/context/authProvider/provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,7 +51,13 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${cormorantGaramond.variable} ${dmSans.variable} antialiased`}
     >
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        <Providers>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </Providers>
+      </body>
     </html>
   );
 }
