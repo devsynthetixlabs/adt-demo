@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/context/authProvider/provider";
 
@@ -9,14 +10,16 @@ function InviteContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { acceptInvitation } = useAuth();
+  const t = useTranslations("auth");
+  const tc = useTranslations("common");
   const token = searchParams.get("token") || "";
 
   const [status, setStatus] = useState<"loading" | "error" | "success">("loading");
-  const [error, setError] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     if (!token) {
-      setError("Invalid invite link. No token found.");
+      setErrorMsg(t("invalidInviteLink"));
       setStatus("error");
       return;
     }
@@ -32,7 +35,7 @@ function InviteContent() {
       const result = await acceptInvitation(token, session.user.id);
 
       if (!result.success) {
-        setError(result.error || "Failed to accept invitation.");
+        setErrorMsg(result.error || t("failedAccept"));
         setStatus("error");
         return;
       }
@@ -42,7 +45,7 @@ function InviteContent() {
     }
 
     handleInvite();
-  }, [token, router]);
+  }, [token, router, t]);
 
   return (
     <div className="min-h-screen lg:min-h-0 lg:h-screen flex flex-col lg:flex-row">
@@ -83,10 +86,10 @@ function InviteContent() {
             {status === "loading" && (
               <div className="text-center">
                 <div className="font-serif text-[2.1rem] font-medium leading-[1.15] text-[#2C2420] tracking-[-0.005em] mb-2">
-                  Accepting invite...
+                  {t("acceptingInvite")}
                 </div>
                 <p className="text-[0.88rem] text-[#9C8E86] leading-[1.6]">
-                  Please wait while we add you to the workspace.
+                  {t("pleaseWait")}
                 </p>
               </div>
             )}
@@ -94,20 +97,20 @@ function InviteContent() {
             {status === "error" && (
               <div>
                 <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-[#2C2420] tracking-[-0.005em] mb-2">
-                  Invite unavailable
+                  {t("inviteUnavailable")}
                 </h2>
                 <p className="text-[0.88rem] text-[#9C8E86] leading-[1.6] mb-8">
-                  This invite link may have expired or already been used.
+                  {t("inviteLinkExpired")}
                 </p>
                 <div className="p-3 bg-[#FDECEA] border border-[#F5C6CB] rounded-lg text-[0.82rem] text-[#721C24] mb-8">
-                  {error}
+                  {errorMsg}
                 </div>
                 <button
                   type="button"
                   onClick={() => router.push("/dashboard")}
                   className="w-full py-3 bg-[#E8601C] text-white border-none rounded-lg text-[0.85rem] font-medium transition-all hover:bg-[#C04E12] touch-manipulation"
                 >
-                  Go to dashboard
+                  {tc("goToDashboard")}
                 </button>
               </div>
             )}

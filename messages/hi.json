@@ -1,0 +1,349 @@
+{
+  "brand": {
+    "name": "ANANTAM · SITE",
+    "tagline": "हर साइट को अपने सबसे अच्छे साइट की तरह चलाएं।",
+    "subtitle": "साइट प्रबंधन, ज़मीन पर।"
+  },
+  "common": {
+    "cancel": "रद्द करें",
+    "save": "सहेजें",
+    "saving": "सहेजा जा रहा है...",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "loading": "लोड हो रहा है...",
+    "backToDashboard": "← डैशबोर्ड पर वापस जाएं",
+    "skipForNow": "अभी के लिए छोड़ें",
+    "goToDashboard": "डैशबोर्ड पर जाएं →",
+    "saveChanges": "बदलाव सहेजें",
+    "search": "खोजें",
+    "noResults": "कोई परिणाम नहीं मिला।",
+    "view": "देखें",
+    "download": "डाउनलोड करें"
+  },
+  "nav": {
+    "tasks": "टास्क शीट",
+    "comms": "साइट संचार",
+    "drawings": "ड्रॉइंग्स",
+    "actions": "कार्य सूची",
+    "materials": "सामग्री",
+    "approvals": "अनुमोदन",
+    "admin": "⚙ एडमिन"
+  },
+  "header": {
+    "signOut": "साइन आउट",
+    "profileSettings": "प्रोफ़ाइल और सेटिंग्स",
+    "quickEdit": "त्वरित प्रोफ़ाइल संपादन",
+    "newProject": "नया प्रोजेक्ट",
+    "overdue": "विलंबित"
+  },
+  "auth": {
+    "signIn": "साइन इन",
+    "signUp": "खाता बनाएं",
+    "alreadyAccount": "पहले से खाता है?",
+    "noAccount": "खाता नहीं है?",
+    "firstName": "पहला नाम",
+    "lastName": "अंतिम नाम",
+    "email": "कार्य ईमेल",
+    "phone": "फ़ोन नंबर",
+    "dob": "जन्म तिथि",
+    "password": "पासवर्ड",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "joinAs": "मैं जुड़ रहा हूँ",
+    "firmName": "फर्म / कंपनी का नाम",
+    "signingIn": "साइन इन हो रहा है...",
+    "creatingAccount": "खाता बनाया जा रहा है...",
+    "owner": "कार्यक्षेत्र बनाएं और ट्रायल शुरू करें",
+    "architect": "खाता बनाएं और ट्रायल शुरू करें",
+    "contractor": "खाता बनाएं और जारी रखें",
+    "terms": "खाता बनाकर आप हमारी",
+    "termsLink": "शर्तों",
+    "privacyLink": "गोपनीयता नीति",
+    "checkInbox": "अपना इनबॉक्स देखें।",
+    "verificationSent": "हमने सत्यापन लिंक भेजा है",
+    "verificationInstructions": "अपना खाता सक्रिय करने के लिए ईमेल में लिंक पर क्लिक करें। पुष्टि के बाद, यहाँ वापस आकर साइन इन करें।",
+    "goToSignIn": "साइन इन पर जाएं →",
+    "wrongEmail": "गलत ईमेल?",
+    "startOver": "फिर से शुरू करें",
+    "welcomeBack": "आपका स्वागत है।",
+    "signInToWorkspace": "अपने कार्यक्षेत्र में साइन इन करें।",
+    "continueWithGoogle": "Google से जारी रखें",
+    "or": "या",
+    "invited": "आपको आमंत्रित किया गया है",
+    "setPassword": "आरंभ करने के लिए अपना पासवर्ड सेट करें।",
+    "accountReady": "आपका खाता तैयार है। पासवर्ड सेट करें ताकि आप कभी भी साइन इन कर सकें।",
+    "newPassword": "नया पासवर्ड",
+    "passwordPlaceholder": "न्यूनतम 8 अक्षर",
+    "confirmPasswordPlaceholder": "पासवर्ड की पुष्टि करें",
+    "settingPassword": "पासवर्ड सेट हो रहा है...",
+    "setPasswordContinue": "पासवर्ड सेट करें और जारी रखें →",
+    "oneMoreStep": "एक और कदम",
+    "completeProfile": "अपनी प्रोफ़ाइल पूरी करें।",
+    "profileHelp": "अपनी टीम को बताएं कि आप कौन हैं। आप इसे सेटिंग्स से कभी भी अपडेट कर सकते हैं।",
+    "phoneOptional": "(वैकल्पिक)",
+    "savingProfile": "सहेजा जा रहा है...",
+    "saveAndGo": "सहेजें और डैशबोर्ड पर जाएं →",
+    "allSet": "सब तैयार है।",
+    "passwordSaved": "आपका पासवर्ड सहेज लिया गया है। अब आप कभी भी अपने ईमेल और पासवर्ड से साइन इन कर सकते हैं।",
+    "forgotYourPassword": "पासवर्ड भूल गए?",
+    "enterEmailReset": "अपना ईमेल दर्ज करें और हम आपको रीसेट लिंक भेजेंगे।",
+    "sendResetLink": "रीसेट लिंक भेजें",
+    "sending": "भेजा जा रहा है...",
+    "resetPassword": "पासवर्ड रीसेट करें",
+    "setNewPassword": "नया पासवर्ड सेट करें।",
+    "chooseStrongPassword": "अपने खाते के लिए एक मज़बूत पासवर्ड चुनें।",
+    "saveNewPassword": "नया पासवर्ड सहेजें →",
+    "passwordUpdated": "पासवर्ड अपडेट हो गया।",
+    "passwordUpdatedMsg": "आपका नया पासवर्ड सहेज लिया गया है। आप साइन इन हैं और जाने के लिए तैयार हैं।",
+    "backToSignIn": "साइन इन पर वापस जाएं",
+    "emailSent": "यदि उस ईमेल के लिए कोई खाता मौजूद है, तो हमने पासवर्ड रीसेट लिंक भेज दिया है। यह 1 घंटे में समाप्त हो जाता है।",
+    "inviteLinkExpired": "यह आमंत्रण लिंक समाप्त हो गया है या पहले ही उपयोग किया जा चुका है।",
+    "inviteUnavailable": "आमंत्रण अनुपलब्ध",
+    "acceptingInvite": "आमंत्रण स्वीकार किया जा रहा है...",
+    "pleaseWait": "कृपया प्रतीक्षा करें जब तक हम आपको कार्यक्षेत्र में जोड़ते हैं।",
+    "errorPrefix": "आमंत्रण संसाधित करने में विफल। कृपया अपने एडमिन से संपर्क करें।",
+    "invalidInviteLink": "अमान्य आमंत्रण लिंक। कोई टोकन नहीं मिला।",
+    "failedAccept": "आमंत्रण स्वीकार करने में विफल।"
+  },
+  "settings": {
+    "title": "प्रोफ़ाइल सेटिंग्स",
+    "subtitle": "अपनी व्यक्तिगत जानकारी और खाता प्राथमिकताएँ प्रबंधित करें",
+    "personalInfo": "व्यक्तिगत जानकारी",
+    "personalInfoDesc": "अपना नाम, फ़ोन नंबर और जन्म तिथि अपडेट करें",
+    "firstName": "पहला नाम",
+    "firstNamePlaceholder": "पहला नाम दर्ज करें",
+    "lastName": "अंतिम नाम",
+    "lastNamePlaceholder": "अंतिम नाम दर्ज करें",
+    "phoneNumber": "फ़ोन नंबर",
+    "phonePlaceholder": "+91 98000 00000",
+    "dob": "जन्म तिथि",
+    "accountInfo": "खाता जानकारी",
+    "accountInfoDesc": "ये विवरण आपके संगठन द्वारा प्रबंधित किए जाते हैं",
+    "emailAddress": "ईमेल पता",
+    "cannotChange": "यहाँ बदला नहीं जा सकता",
+    "role": "भूमिका",
+    "setByOrg": "आपके संगठन द्वारा निर्धारित",
+    "firmOrg": "फर्म / संगठन",
+    "accountActions": "खाता कार्रवाइयाँ",
+    "signOut": "साइन आउट",
+    "signOutDesc": "आपको लॉगिन पेज पर रीडायरेक्ट किया जाएगा",
+    "profileUpdated": "प्रोफ़ाइल सफलतापूर्वक अपडेट हो गई",
+    "updateFailed": "प्रोफ़ाइल अपडेट करने में विफल",
+    "language": "भाषा",
+    "languageDesc": "अपनी पसंदीदा भाषा चुनें",
+    "languageSection": "भाषा और क्षेत्र",
+    "languageSectionDesc": "एप्लिकेशन में उपयोग की जाने वाली भाषा चुनें"
+  },
+  "dashboard": {
+    "taskSheet": {
+      "title": "दैनिक कार्य पत्रक",
+      "subtitle": "यूनिट के अनुसार फ़िल्टर करें · कार्य जोड़ें और ट्रैक करें",
+      "kpis": {
+        "total": "कुल कार्य",
+        "done": "पूर्ण",
+        "inProgress": "प्रगति पर",
+        "pendingDelayed": "लंबित / विलंबित"
+      },
+      "views": {
+        "all": "📋 सभी कार्य",
+        "byRoom": "🏠 कमरे के अनुसार"
+      },
+      "tableHeaders": {
+        "task": "कार्य",
+        "unit": "यूनिट",
+        "room": "कमरा",
+        "assignee": "जिम्मेदार",
+        "start": "शुरू",
+        "end": "समाप्ति",
+        "status": "स्थिति",
+        "action": "कार्रवाई"
+      },
+      "empty": "कोई कार्य नहीं मिला। आरंभ करने के लिए एक जोड़ें।",
+      "addTask": "+ कार्य जोड़ें",
+      "newTask": "नया कार्य",
+      "editTask": "कार्य संपादित करें",
+      "desc": "विवरण *",
+      "room": "कमरा",
+      "assignee": "जिम्मेदार",
+      "startDate": "प्रारंभ तिथि",
+      "endDate": "समाप्ति तिथि",
+      "notes": "विलंब नोट्स",
+      "saveTask": "कार्य सहेजें"
+    },
+    "approvals": {
+      "title": "अनुमोदन लॉग",
+      "subtitle": "क्लाइंट हस्ताक्षर · MEP सलाहकार अनुमोदन · डिज़ाइन निर्णय",
+      "kpis": {
+        "total": "कुल",
+        "approved": "स्वीकृत",
+        "pending": "लंबित",
+        "revisionRejected": "संशोधन / अस्वीकृत"
+      },
+      "filters": {
+        "type": "प्रकार",
+        "status": "स्थिति",
+        "unit": "यूनिट"
+      },
+      "card": {
+        "submitted": "प्रस्तुत:",
+        "responded": "प्रतिक्रिया:",
+        "awaiting": "प्रतीक्षारत",
+        "loggedBy": "द्वारा लॉग किया गया"
+      },
+      "empty": "कोई अनुमोदन आपके फ़िल्टर से मेल नहीं खाता।",
+      "addApproval": "+ अनुमोदन लॉग करें",
+      "editApproval": "अनुमोदन संपादित करें"
+    },
+    "materials": {
+      "title": "सामग्री ट्रैकर",
+      "subtitle": "खरीद स्थिति लॉग करें · डिलीवरी ट्रैक करें · कमरों से लिंक करें",
+      "kpis": {
+        "total": "कुल आइटम",
+        "delivered": "वितरित",
+        "ordered": "ऑर्डर किया / पारगमन में",
+        "pending": "लंबित ऑर्डर"
+      },
+      "filters": {
+        "status": "स्थिति",
+        "unit": "यूनिट",
+        "category": "श्रेणी"
+      },
+      "tableHeaders": {
+        "item": "आइटम",
+        "category": "श्रेणी",
+        "unitRoom": "यूनिट / कमरा",
+        "vendor": "विक्रेता",
+        "qty": "मात्रा",
+        "orderDate": "ऑर्डर तिथि",
+        "eta": "अनुमानित आगमन",
+        "status": "स्थिति"
+      },
+      "empty": "अभी तक कोई सामग्री लॉग नहीं की गई।",
+      "addMaterial": "+ सामग्री जोड़ें",
+      "addItem": "सामग्री / आइटम जोड़ें",
+      "editItem": "सामग्री संपादित करें"
+    },
+    "drawings": {
+      "title": "ड्रॉइंग्स और दस्तावेज़",
+      "subtitle": "GFC ड्रॉइंग्स अपलोड करें · कमरों को असाइन करें · कभी भी डाउनलोड करें",
+      "upload": "PDF ड्रॉप करें या अपलोड करने के लिए क्लिक करें",
+      "uploadHint": "PDF, DWG संदर्भ, चित्र सहायक · अधिकतम 50MB प्रति फ़ाइल",
+      "empty": "अभी तक कोई ड्रॉइंग अपलोड नहीं की गई।",
+      "filters": {
+        "type": "प्रकार"
+      }
+    },
+    "actions": {
+      "title": "कार्य सूची",
+      "subtitle": "दैनिक अनुस्मारक · साइट दोष · हर चीज़ जिस पर ध्यान देने की आवश्यकता है",
+      "tabs": {
+        "reminders": "🔔 अनुस्मारक",
+        "snags": "🚧 दोष"
+      },
+      "reminders": {
+        "header": "आज के कार्य अनुस्मारक",
+        "empty": "आज के लिए कोई अनुस्मारक नहीं 🎉"
+      },
+      "snags": {
+        "kpis": {
+          "total": "कुल दोष",
+          "open": "खुला",
+          "inRectification": "सुधाराधीन",
+          "signedOff": "हस्ताक्षरित"
+        },
+        "filters": {
+          "severity": "गंभीरता",
+          "status": "स्थिति"
+        },
+        "empty": "कोई दोष लॉग नहीं। सब साफ़ है! ✅",
+        "logDefect": "+ दोष लॉग करें",
+        "logDefectTitle": "दोष / खामी लॉग करें",
+        "raisedBy": "द्वारा सूचित",
+        "onDate": "को",
+        "assignedTo": "जिम्मेदार",
+        "target": "लक्ष्य"
+      },
+      "send": "भेजें"
+    },
+    "comms": {
+      "title": "साइट संचार",
+      "subtitle": "कक्ष चैनल · फ़ोटो साझाकरण · घोषणाएँ",
+      "channels": "चैनल",
+      "online": "ऑनलाइन",
+      "empty": "अभी तक कोई संदेश नहीं। बातचीत शुरू करें।",
+      "today": "आज",
+      "messagePlaceholder": "एक संदेश लिखें..."
+    },
+    "overview": {
+      "title": "साप्ताहिक अवलोकन",
+      "subtitle": "KPI, फ़्लैग और प्रगति एक नज़र में",
+      "kpis": {
+        "totalTasks": "कुल कार्य",
+        "done": "पूर्ण",
+        "inProgress": "प्रगति पर",
+        "pending": "लंबित",
+        "delayed": "विलंबित"
+      },
+      "overdue": "🚩 विलंबित कार्य",
+      "unitProgress": "यूनिट प्रगति",
+      "assigneeWorkload": "जिम्मेदार कार्यभार",
+      "tasksCount": "कार्य",
+      "active": "सक्रिय"
+    }
+  },
+  "status": {
+    "task": {
+      "Pending": "लंबित",
+      "In Progress": "प्रगति पर",
+      "Done": "पूर्ण",
+      "Delayed": "विलंबित"
+    },
+    "material": {
+      "Pending Order": "लंबित ऑर्डर",
+      "Ordered": "ऑर्डर किया गया",
+      "Delivered": "वितरित",
+      "On Hold": "रोका गया"
+    },
+    "approval": {
+      "Pending": "लंबित",
+      "Approved": "स्वीकृत",
+      "Rejected": "अस्वीकृत",
+      "Revision Required": "संशोधन आवश्यक"
+    },
+    "snagSeverity": {
+      "Critical": "गंभीर",
+      "Major": "प्रमुख",
+      "Minor": "मामूली"
+    },
+    "snagStatus": {
+      "Open": "खुला",
+      "In Rectification": "सुधाराधीन",
+      "Rectified": "सुधारित",
+      "Signed Off": "हस्ताक्षरित"
+    },
+    "notePriority": {
+      "high": "उच्च",
+      "medium": "मध्यम",
+      "info": "जानकारी"
+    }
+  },
+  "role": {
+    "owner": "मालिक",
+    "architect": "आर्किटेक्ट",
+    "contractor": "ठेकेदार"
+  },
+  "toast": {
+    "taskAdded": "कार्य जोड़ा गया",
+    "taskDeleted": "कार्य हटाया गया",
+    "taskUpdated": "कार्य अपडेट किया गया",
+    "materialAdded": "सामग्री जोड़ी गई",
+    "materialUpdated": "सामग्री अपडेट की गई",
+    "materialRemoved": "सामग्री हटाई गई",
+    "approvalLogged": "अनुमोदन लॉग किया गया",
+    "approvalUpdated": "अनुमोदन अपडेट किया गया",
+    "approvalRemoved": "अनुमोदन हटाया गया",
+    "snagLogged": "दोष लॉग किया गया",
+    "profileUpdated": "प्रोफ़ाइल अपडेट की गई",
+    "projectSwitched": "में स्विच किया गया"
+  }
+}

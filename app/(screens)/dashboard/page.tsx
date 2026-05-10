@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/authProvider/provider";
 import { useProjects } from "@/hooks/use-projects";
 import { useUnits } from "@/hooks/use-units";
@@ -99,6 +100,10 @@ type TabKey = "tasks" | "comms" | "drawings" | "actions" | "materials" | "approv
 export default function DashboardPage() {
   const router = useRouter();
   const { session, isLoading, signOutUser, updateUserProfile } = useAuth();
+  const tn = useTranslations("nav");
+  const th = useTranslations("header");
+  const ts = useTranslations("status");
+  const tr = useTranslations("role");
   const {
     activeProjectId, setActiveProjectId,
     activeTab, setActiveTab,
@@ -284,6 +289,28 @@ export default function DashboardPage() {
       setApprovalForm({ desc: "", type: "Client", unit: units[0] || "", submittedBy: session?.fullName || "", submittedDate: TODAY, respondedDate: "", status: "Pending", remarks: "" });
     }
   }, [showApprovalModal]);
+
+  const currentUserProfile = project
+    ? Object.values(project.assigneeProfiles).find((p) => p.email === session?.email)
+    : undefined;
+
+  const VISIBILITY_TAB_MAP: Record<string, TabKey> = {
+    tasks: "tasks", reminders: "actions",
+    drawings: "drawings", materials: "materials",
+    comms: "comms", approvals: "approvals",
+    snags: "actions", notes: "tasks",
+  };
+
+  const allowedTabs: TabKey[] | null =
+    session?.role === "owner" || !currentUserProfile?.visibility?.length
+      ? null
+      : [...new Set(currentUserProfile.visibility.map((k) => VISIBILITY_TAB_MAP[k]).filter(Boolean))] as TabKey[];
+
+  useEffect(() => {
+    if (allowedTabs && activeTab && !allowedTabs.includes(activeTab)) {
+      setActiveTab(allowedTabs[0]);
+    }
+  }, [allowedTabs, activeTab]);
 
   if (isLoading || !session) return <PageLoader />;
   if (!project) return <PageLoader />;
@@ -822,17 +849,17 @@ export default function DashboardPage() {
   const progressPct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
 
   const navTabs: { key: TabKey; label: string; admin?: boolean }[] = [
-    { key: "tasks", label: "Task Sheets" },
-    { key: "comms", label: "Site Comms" },
-    { key: "drawings", label: "Drawings" },
-    { key: "actions", label: "Action Items" },
-    { key: "materials", label: "Materials" },
-    { key: "approvals", label: "Approvals" },
-    { key: "admin", label: "⚙ Admin", admin: true },
+    { key: "tasks", label: tn("tasks") },
+    { key: "comms", label: tn("comms") },
+    { key: "drawings", label: tn("drawings") },
+    { key: "actions", label: tn("actions") },
+    { key: "materials", label: tn("materials") },
+    { key: "approvals", label: tn("approvals") },
+    { key: "admin", label: tn("admin"), admin: true },
   ];
 
   const roleIcon = session.role === "owner" ? "👑" : session.role === "architect" ? "📐" : "🔧";
-  const roleLabel = session.role === "owner" ? "Owner" : session.role === "architect" ? "Architect" : "Contractor";
+  const roleLabel = tr(session.role);
   const initials =
     session.firstName && session.lastName
       ? `${session.firstName[0]}${session.lastName[0]}`.toUpperCase()
@@ -890,7 +917,7 @@ export default function DashboardPage() {
                   className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[7px] cursor-pointer transition-all hover:bg-[#FEF4EF] text-left"
                 >
                   <span className="w-7 h-7 rounded-lg bg-[#FEF4EF] border-[1.5px] border-[#F4895A] flex items-center justify-center text-[#E8601C] text-[1rem] flex-shrink-0">+</span>
-                  <span className="text-[0.84rem] font-semibold text-[#E8601C]">New Project</span>
+                  <span className="text-[0.84rem] font-semibold text-[#E8601C]">{th("newProject")}</span>
                 </button>
               </div>
             </div>
@@ -934,7 +961,7 @@ export default function DashboardPage() {
                     onClick={() => { setShowUserMenu(false); router.push("/settings"); }}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[0.82rem] text-[#2C2420] hover:bg-[#FEF4EF] hover:text-[#E8601C] transition-all text-left cursor-pointer"
                   >
-                    <span className="text-[0.88rem]">⚙</span> Profile & Settings
+                    <span className="text-[0.88rem]">⚙</span> {th("profileSettings")}
                   </button>
                   <button
                     onClick={() => {
@@ -944,14 +971,14 @@ export default function DashboardPage() {
                     }}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[0.82rem] text-[#2C2420] hover:bg-[#FEF4EF] hover:text-[#E8601C] transition-all text-left cursor-pointer"
                   >
-                    <span className="text-[0.88rem]">✏️</span> Quick Edit Profile
+                    <span className="text-[0.88rem]">✏️</span> {th("quickEdit")}
                   </button>
                   <div className="border-t border-[#E2DAD1] my-1" />
                   <button
                     onClick={async () => { setShowUserMenu(false); await signOutUser(); router.push("/auth"); }}
                     className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[0.82rem] text-[#C0392B] hover:bg-[#FDECEA] transition-all text-left cursor-pointer font-medium"
                   >
-                    <span className="text-[0.88rem]">→</span> Sign Out
+                    <span className="text-[0.88rem]">→</span> {th("signOut")}
                   </button>
                 </div>
               </div>
@@ -973,7 +1000,7 @@ export default function DashboardPage() {
           <div className="flex gap-3.5 text-[0.72rem] text-white/85">
             <span>📋 {totalTasks} tasks</span>
             <span>⚡ {totalTasks - doneTasks} open</span>
-            {overdueTasks > 0 && <span className="text-[#ffb0b0]">🚨 {overdueTasks} overdue</span>}
+            {overdueTasks > 0 && <span className="text-[#ffb0b0]">🚨 {overdueTasks} {th("overdue")}</span>}
           </div>
         </div>
       </div>
@@ -981,7 +1008,10 @@ export default function DashboardPage() {
       {/* NAV TABS */}
       <nav className="bg-white flex px-6 sm:px-8 gap-0 overflow-x-auto border-b border-[#E2DAD1] items-end">
         <div className="flex gap-0">
-          {navTabs.filter((t) => !t.admin).map((t) => (
+          {navTabs.filter((t) => {
+            if (t.admin) return false;
+            return !allowedTabs || allowedTabs.includes(t.key);
+          }).map((t) => (
             <button
               key={t.key}
               onClick={() => setActiveTab(t.key)}

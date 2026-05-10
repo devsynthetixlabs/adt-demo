@@ -2,9 +2,13 @@ import React from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { Providers } from "@/context/queryProvider/provider";
 import { AuthProvider } from "@/context/authProvider/provider";
+import { LocaleProvider } from "@/context/localeProvider/provider";
+import { defaultLocale } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,22 +45,27 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const locale: Locale = (cookieStore.get("NEXT_LOCALE")?.value as Locale) || defaultLocale;
+
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} ${cormorantGaramond.variable} ${dmSans.variable} antialiased`}
     >
       <body className="min-h-screen antialiased">
-        <Providers>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </Providers>
+        <LocaleProvider initialLocale={locale}>
+          <Providers>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </Providers>
+        </LocaleProvider>
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import {
   Button,
   Input,
@@ -21,11 +22,6 @@ import {
 } from "@/types";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/context/authProvider/provider";
-
-const authModeTabs: TabItem<AuthMode>[] = [
-  { key: "signup", label: "Create account" },
-  { key: "signin", label: "Sign in" },
-];
 
 /* ─── Schemas ─── */
 
@@ -103,6 +99,14 @@ function AuthForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { signUpUser, signInUser } = useAuth();
+  const t = useTranslations("auth");
+  const tb = useTranslations("brand");
+  const tr = useTranslations("role");
+  const tc = useTranslations("common");
+  const authModeTabs: TabItem<AuthMode>[] = [
+    { key: "signup", label: t("signUp") },
+    { key: "signin", label: t("signIn") },
+  ];
   const [mode, setMode] = useState<AuthMode>("signin");
   const [serverError, setServerError] = useState("");
   const [signupDone, setSignupDone] = useState(false);
@@ -118,6 +122,7 @@ function AuthForm() {
   const [forgotDone, setForgotDone] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
   const [resetDone, setResetDone] = useState(false);
+  const [processingInvite, setProcessingInvite] = useState(false);
 
   const isOverrideMode = isInviteMode || isForgotMode || isResetMode;
 
@@ -154,6 +159,7 @@ function AuthForm() {
 
     // Wipe the tokens from the URL immediately so they're not visible or bookmarked
     window.history.replaceState(null, "", "/auth");
+    setProcessingInvite(true);
 
     (async () => {
       const { data, error } = await supabase.auth.setSession({
@@ -162,6 +168,7 @@ function AuthForm() {
       });
 
       if (error || !data.user) {
+        setProcessingInvite(false);
         setServerError("Failed to process invitation. Please contact your admin.");
         return;
       }
@@ -174,6 +181,7 @@ function AuthForm() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
+      setProcessingInvite(false);
       setIsInviteMode(true);
       setInviteEmail(data.user.email || "");
     })();
@@ -335,6 +343,20 @@ function AuthForm() {
     signin.clearErrors();
   }
 
+  if (processingInvite) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-offwhite">
+        <div className="text-center">
+          <div className="font-serif text-[1.8rem] font-semibold text-ink mb-3">
+            ANANTAM<span className="font-light"> · SITE</span>
+          </div>
+          <div className="text-[0.82rem] text-ink-soft mb-6">Setting up your account...</div>
+          <div className="w-6 h-6 border-2 border-orange border-t-transparent rounded-full animate-spin mx-auto" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen lg:min-h-0 lg:h-screen flex flex-col lg:flex-row">
       {/* LEFT: BRAND PANEL */}
@@ -437,15 +459,15 @@ function AuthForm() {
           <div className="flex justify-end px-6 sm:px-10 pt-8 text-[0.82rem] text-ink-soft">
             <span>
               {mode === "signup"
-                ? "Already have an account?"
-                : "Don't have an account?"}
+                ? t("alreadyAccount")
+                : t("noAccount")}
             </span>
             <button
               type="button"
               className="text-orange font-medium ml-1 hover:underline touch-manipulation"
               onClick={() => switchMode(mode === "signup" ? "signin" : "signup")}
             >
-              {mode === "signup" ? "Sign in" : "Create account"}
+              {mode === "signup" ? t("signIn") : t("signUp")}
             </button>
           </div>
         )}
@@ -474,21 +496,19 @@ function AuthForm() {
                 <section>
                   <div className="inline-flex items-center gap-[0.45rem] bg-orange-xpale text-orange-dark border border-orange-pale px-[0.7rem] py-[0.3rem] rounded-full text-[0.72rem] font-medium tracking-[0.02em] mb-6">
                     <span className="w-[6px] h-[6px] bg-orange rounded-full" />
-                    You&apos;ve been invited
+                    {t("invited")}
                   </div>
 
                   <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-ink tracking-[-0.005em] mb-2">
-                    Set your password
-                    <br />
-                    to get started.
+                    {t("setPassword")}
                   </h2>
                   <p className="text-[0.88rem] text-ink-soft mb-8 leading-[1.6]">
-                    Your account is ready. Set a password so you can sign in anytime.
+                    {t("accountReady")}
                   </p>
 
                   {inviteEmail && (
                     <div className="mb-6">
-                      <Label>Email</Label>
+                      <Label>{t("email")}</Label>
                       <Input
                         type="email"
                         value={inviteEmail}
@@ -499,10 +519,10 @@ function AuthForm() {
                   )}
 
                   <form onSubmit={inviteForm.handleSubmit(onSetInvitePassword)}>
-                    <Label>New password</Label>
+                    <Label>{t("newPassword")}</Label>
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Min. 8 characters"
+                      placeholder={t("passwordPlaceholder")}
                       suffix={
                         <button
                           type="button"
@@ -519,10 +539,10 @@ function AuthForm() {
                     <PasswordStrength password={invitePassword} />
                     <div className="h-6" />
 
-                    <Label>Confirm password</Label>
+                    <Label>{t("confirmPassword")}</Label>
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm password"
+                      placeholder={t("confirmPasswordPlaceholder")}
                       suffix={
                         <button
                           type="button"
@@ -545,8 +565,8 @@ function AuthForm() {
                       disabled={inviteForm.formState.isSubmitting}
                     >
                       {inviteForm.formState.isSubmitting
-                        ? "Setting password..."
-                        : "Set password & continue →"}
+                        ? t("settingPassword")
+                        : t("setPasswordContinue")}
                     </Button>
                   </form>
 
@@ -555,7 +575,7 @@ function AuthForm() {
                     onClick={() => router.push("/dashboard")}
                     className="mt-4 w-full py-2 text-[0.82rem] text-ink-soft hover:text-ink text-center transition-colors"
                   >
-                    Skip for now — go to dashboard
+                    {tc("skipForNow")}
                   </button>
                 </section>
               )}
@@ -565,22 +585,20 @@ function AuthForm() {
                 <section>
                   <div className="inline-flex items-center gap-[0.45rem] bg-orange-xpale text-orange-dark border border-orange-pale px-[0.7rem] py-[0.3rem] rounded-full text-[0.72rem] font-medium tracking-[0.02em] mb-6">
                     <span className="w-[6px] h-[6px] bg-orange rounded-full" />
-                    One more step
+                    {t("oneMoreStep")}
                   </div>
 
                   <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-ink tracking-[-0.005em] mb-2">
-                    Complete your
-                    <br />
-                    profile.
+                    {t("completeProfile")}
                   </h2>
                   <p className="text-[0.88rem] text-ink-soft mb-8 leading-[1.6]">
-                    Help your team know who you are. You can update this anytime from settings.
+                    {t("profileHelp")}
                   </p>
 
                   <form onSubmit={inviteProfileForm.handleSubmit(onSaveInviteProfile)}>
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       <div>
-                        <Label>First name</Label>
+                        <Label>{t("firstName")}</Label>
                         <Input
                           type="text"
                           placeholder="John"
@@ -589,7 +607,7 @@ function AuthForm() {
                         />
                       </div>
                       <div>
-                        <Label>Last name</Label>
+                        <Label>{t("lastName")}</Label>
                         <Input
                           type="text"
                           placeholder="Doe"
@@ -599,7 +617,7 @@ function AuthForm() {
                       </div>
                     </div>
 
-                    <Label>Phone number <span className="text-muted font-normal">(optional)</span></Label>
+                    <Label>{t("phone")} <span className="text-muted font-normal">{t("phoneOptional")}</span></Label>
                     <div className="flex gap-2 mb-8 items-start">
                       <div className="relative self-start">
                         <span className="w-[100px] pl-3 pr-7 py-[0.72rem] inline-flex items-center bg-white border-[1.5px] border-offwhite-dark rounded-lg text-[0.88rem] text-ink-soft">
@@ -628,7 +646,7 @@ function AuthForm() {
                       type="submit"
                       disabled={inviteProfileForm.formState.isSubmitting}
                     >
-                      {inviteProfileForm.formState.isSubmitting ? "Saving..." : "Save & go to dashboard →"}
+                      {inviteProfileForm.formState.isSubmitting ? t("savingProfile") : t("saveAndGo")}
                     </Button>
                   </form>
 
@@ -637,7 +655,7 @@ function AuthForm() {
                     onClick={() => setInviteDone(true)}
                     className="mt-4 w-full py-2 text-[0.82rem] text-ink-soft hover:text-ink text-center transition-colors"
                   >
-                    Skip for now
+                    {tc("skipForNow")}
                   </button>
                 </section>
               )}
@@ -651,17 +669,17 @@ function AuthForm() {
                     </svg>
                   </div>
                   <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-ink tracking-[-0.005em] mb-3">
-                    You&apos;re all set.
+                    {t("allSet")}
                   </h2>
                   <p className="text-[0.88rem] text-ink-soft leading-[1.6] mb-8">
-                    Your password has been saved. You can now sign in anytime with your email and password.
+                    {t("passwordSaved")}
                   </p>
                   <button
                     type="button"
                     onClick={() => router.push("/dashboard")}
                     className="w-full py-3 bg-[#E8601C] text-white rounded-lg text-[0.85rem] font-medium transition-all hover:bg-[#C04E12] touch-manipulation"
                   >
-                    Go to dashboard →
+                    {tc("goToDashboard")}
                   </button>
                 </section>
               )}
@@ -675,20 +693,18 @@ function AuthForm() {
                     className="flex items-center gap-1 text-[0.8rem] text-ink-soft hover:text-ink mb-6 transition-colors"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-                    Back to sign in
+                    {t("backToSignIn")}
                   </button>
 
                   <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-ink tracking-[-0.005em] mb-2">
-                    Forgot your
-                    <br />
-                    password?
+                    {t("forgotYourPassword")}
                   </h2>
                   <p className="text-[0.88rem] text-ink-soft mb-8 leading-[1.6]">
-                    Enter your email and we&apos;ll send you a reset link.
+                    {t("enterEmailReset")}
                   </p>
 
                   <form onSubmit={forgotForm.handleSubmit(onForgotPassword)}>
-                    <Label>Work email</Label>
+                    <Label>{t("email")}</Label>
                     <Input
                       type="email"
                       placeholder="you@studio.com"
@@ -703,7 +719,7 @@ function AuthForm() {
                       type="submit"
                       disabled={forgotForm.formState.isSubmitting}
                     >
-                      {forgotForm.formState.isSubmitting ? "Sending..." : "Send reset link"}
+                      {forgotForm.formState.isSubmitting ? t("sending") : t("sendResetLink")}
                     </Button>
                   </form>
                 </section>
@@ -719,17 +735,17 @@ function AuthForm() {
                     </svg>
                   </div>
                   <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-ink tracking-[-0.005em] mb-3">
-                    Check your inbox.
+                    {t("checkInbox")}
                   </h2>
                   <p className="text-[0.88rem] text-ink-soft leading-[1.6] mb-8">
-                    If an account exists for that email, we&apos;ve sent a password reset link. It expires in 1 hour.
+                    {t("emailSent")}
                   </p>
                   <button
                     type="button"
                     onClick={() => { setIsForgotMode(false); setForgotDone(false); forgotForm.reset(); setServerError(""); }}
                     className="w-full py-3 bg-[#E8601C] text-white rounded-lg text-[0.85rem] font-medium transition-all hover:bg-[#C04E12] touch-manipulation"
                   >
-                    Back to sign in
+                    {t("backToSignIn")}
                   </button>
                 </section>
               )}
@@ -739,23 +755,21 @@ function AuthForm() {
                 <section>
                   <div className="inline-flex items-center gap-[0.45rem] bg-orange-xpale text-orange-dark border border-orange-pale px-[0.7rem] py-[0.3rem] rounded-full text-[0.72rem] font-medium tracking-[0.02em] mb-6">
                     <span className="w-[6px] h-[6px] bg-orange rounded-full" />
-                    Reset your password
+                    {t("resetPassword")}
                   </div>
 
                   <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-ink tracking-[-0.005em] mb-2">
-                    Set a new
-                    <br />
-                    password.
+                    {t("setNewPassword")}
                   </h2>
                   <p className="text-[0.88rem] text-ink-soft mb-8 leading-[1.6]">
-                    Choose a strong password for your account.
+                    {t("chooseStrongPassword")}
                   </p>
 
                   <form onSubmit={resetForm.handleSubmit(onResetPassword)}>
-                    <Label>New password</Label>
+                    <Label>{t("newPassword")}</Label>
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Min. 8 characters"
+                      placeholder={t("passwordPlaceholder")}
                       suffix={
                         <button
                           type="button"
@@ -772,10 +786,10 @@ function AuthForm() {
                     <PasswordStrength password={resetPassword} />
                     <div className="h-6" />
 
-                    <Label>Confirm password</Label>
+                    <Label>{t("confirmPassword")}</Label>
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm password"
+                      placeholder={t("confirmPasswordPlaceholder")}
                       suffix={
                         <button
                           type="button"
@@ -797,7 +811,7 @@ function AuthForm() {
                       type="submit"
                       disabled={resetForm.formState.isSubmitting}
                     >
-                      {resetForm.formState.isSubmitting ? "Saving..." : "Save new password →"}
+                      {resetForm.formState.isSubmitting ? t("savingProfile") : t("saveNewPassword")}
                     </Button>
                   </form>
                 </section>
@@ -812,17 +826,17 @@ function AuthForm() {
                     </svg>
                   </div>
                   <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-ink tracking-[-0.005em] mb-3">
-                    Password updated.
+                    {t("passwordUpdated")}
                   </h2>
                   <p className="text-[0.88rem] text-ink-soft leading-[1.6] mb-8">
-                    Your new password is saved. You&apos;re signed in and ready to go.
+                    {t("passwordUpdatedMsg")}
                   </p>
                   <button
                     type="button"
                     onClick={() => router.push("/dashboard")}
                     className="w-full py-3 bg-[#E8601C] text-white rounded-lg text-[0.85rem] font-medium transition-all hover:bg-[#C04E12] touch-manipulation"
                   >
-                    Go to dashboard →
+                    {tc("goToDashboard")}
                   </button>
                 </section>
               )}
@@ -833,23 +847,17 @@ function AuthForm() {
                   <TrialBadge />
 
                   <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-ink tracking-[-0.005em] mb-2">
-                    Get your studio
-                    <br />
-                    set up in minutes.
+                    {t("signUp")}
                   </h2>
-                  <p className="text-[0.88rem] text-ink-soft mb-8 leading-[1.6]">
-                    For architects, designers, and contractors running residential
-                    and commercial sites.
-                  </p>
 
                   <OAuthButtons mode={mode} />
 
-                  <Divider text="or with your work email" />
+                  <Divider text={t("or")} />
 
                   <form onSubmit={signup.handleSubmit(onSignup)} className="mt-6">
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       <div>
-                        <Label>First name</Label>
+                        <Label>{t("firstName")}</Label>
                         <Input
                           type="text"
                           placeholder="John"
@@ -858,7 +866,7 @@ function AuthForm() {
                         />
                       </div>
                       <div>
-                        <Label>Last name</Label>
+                        <Label>{t("lastName")}</Label>
                         <Input
                           type="text"
                           placeholder="Doe"
@@ -868,7 +876,7 @@ function AuthForm() {
                       </div>
                     </div>
 
-                    <Label>Work email</Label>
+                    <Label>{t("email")}</Label>
                     <Input
                       type="email"
                       placeholder="you@studio.com"
@@ -877,7 +885,7 @@ function AuthForm() {
                       {...signup.register("email")}
                     />
 
-                    <Label>Phone number</Label>
+                    <Label>{t("phone")}</Label>
                     <div className="flex gap-2 mb-6 items-start">
                       <div className="relative self-start">
                         <select
@@ -907,7 +915,7 @@ function AuthForm() {
                     </div>
 
 
-                    <Label>Date of Birth</Label>
+                    <Label>{t("dob")}</Label>
                     <Input
                       type="date"
                       className="mb-6 w-full"
@@ -915,10 +923,10 @@ function AuthForm() {
                       {...signup.register("dob")}
                     />
 
-                    <Label>Password</Label>
+                    <Label>{t("password")}</Label>
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="Min. 8 characters"
+                      placeholder={t("passwordPlaceholder")}
                       suffix={
                         <button
                           type="button"
@@ -935,10 +943,10 @@ function AuthForm() {
                     <PasswordStrength password={signupPassword} />
                     <div className="h-6" />
 
-                    <Label>Confirm Password</Label>
+                    <Label>{t("confirmPassword")}</Label>
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm password"
+                      placeholder={t("confirmPasswordPlaceholder")}
                       suffix={
                         <button
                           type="button"
@@ -953,7 +961,7 @@ function AuthForm() {
                       {...signup.register("confirmPassword")}
                     />
 
-                    <Label className="mb-2">I'm joining as</Label>
+                    <Label className="mb-2">{t("joinAs")}</Label>
                     <Controller
                       control={signup.control}
                       name="role"
@@ -968,7 +976,7 @@ function AuthForm() {
 
                     {(signupRole === "owner" || signupRole === "architect") && (
                       <>
-                        <Label>Firm / company name</Label>
+                        <Label>{t("firmName")}</Label>
                         <Input
                           type="text"
                           placeholder="Anantam Designs"
@@ -987,22 +995,22 @@ function AuthForm() {
                       disabled={signup.formState.isSubmitting}
                     >
                       {signup.formState.isSubmitting
-                        ? "Creating account..."
+                        ? t("creatingAccount")
                         : signupRole === "owner"
-                          ? "Create workspace & start trial"
+                          ? t("owner")
                           : signupRole === "architect"
-                            ? "Create account & start trial"
-                            : "Create account & continue"}
+                            ? t("architect")
+                            : t("contractor")}
                     </Button>
 
                     <p className="mt-6 text-[0.72rem] text-muted text-center leading-[1.6]">
-                      By creating an account you agree to our{" "}
+                      {t("terms")}{" "}
                       <a href="#" className="text-ink-soft underline underline-offset-2 hover:text-orange" onClick={(e) => e.preventDefault()}>
-                        Terms
+                        {t("termsLink")}
                       </a>{" "}
                       and{" "}
                       <a href="#" className="text-ink-soft underline underline-offset-2 hover:text-orange" onClick={(e) => e.preventDefault()}>
-                        Privacy policy
+                        {t("privacyLink")}
                       </a>
                       .
                     </p>
@@ -1020,32 +1028,32 @@ function AuthForm() {
                     </svg>
                   </div>
                   <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-ink tracking-[-0.005em] mb-3">
-                    Check your inbox.
+                    {t("checkInbox")}
                   </h2>
                   <p className="text-[0.88rem] text-ink-soft leading-[1.6] mb-2">
-                    We sent a verification link to
+                    {t("verificationSent")}
                   </p>
                   <p className="text-[0.88rem] font-medium text-ink mb-6 break-all">
                     {signupEmail}
                   </p>
                   <p className="text-[0.82rem] text-ink-soft leading-[1.6] mb-8">
-                    Click the link in the email to activate your account. Once confirmed, come back here and sign in.
+                    {t("verificationInstructions")}
                   </p>
                   <button
                     type="button"
                     onClick={() => switchMode("signin")}
                     className="w-full py-3 bg-[#E8601C] text-white rounded-lg text-[0.85rem] font-medium transition-all hover:bg-[#C04E12] touch-manipulation"
                   >
-                    Go to sign in →
+                    {t("goToSignIn")}
                   </button>
                   <p className="mt-4 text-[0.78rem] text-muted text-center">
-                    Wrong email?{" "}
+                    {t("wrongEmail")}{" "}
                     <button
                       type="button"
                       className="text-orange hover:underline"
                       onClick={() => { setSignupDone(false); setSignupEmail(""); signup.reset(); }}
                     >
-                      Start over
+                      {t("startOver")}
                     </button>
                   </p>
                 </section>
@@ -1055,18 +1063,18 @@ function AuthForm() {
               {!isOverrideMode && mode === "signin" && (
                 <section>
                   <h2 className="font-serif text-[2.1rem] font-medium leading-[1.15] text-ink tracking-[-0.005em] mb-2">
-                    Welcome back.
+                    {t("welcomeBack")}
                   </h2>
                   <p className="text-[0.88rem] text-ink-soft mb-8 leading-[1.6]">
-                    Sign in to your workspace.
+                    {t("signInToWorkspace")}
                   </p>
 
                   <OAuthButtons mode={mode} />
 
-                  <Divider text="or" />
+                  <Divider text={t("or")} />
 
                   <form onSubmit={signin.handleSubmit(onSignin)} className="mt-6">
-                    <Label>Work email</Label>
+                    <Label>{t("email")}</Label>
                     <Input
                       type="email"
                       placeholder="you@studio.com"
@@ -1075,7 +1083,7 @@ function AuthForm() {
                       {...signin.register("email")}
                     />
 
-                    <Label>Password</Label>
+                    <Label>{t("password")}</Label>
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
@@ -1098,7 +1106,7 @@ function AuthForm() {
                         className="text-orange cursor-pointer hover:underline bg-transparent border-none p-0"
                         onClick={() => { setIsForgotMode(true); setServerError(""); }}
                       >
-                        Forgot password?
+                        {t("forgotPassword")}
                       </button>
                     </div>
 
@@ -1109,7 +1117,7 @@ function AuthForm() {
                       type="submit"
                       disabled={signin.formState.isSubmitting}
                     >
-                      {signin.formState.isSubmitting ? "Signing in..." : "Sign in"}
+                      {signin.formState.isSubmitting ? t("signingIn") : t("signIn")}
                     </Button>
                   </form>
                 </section>
@@ -1134,6 +1142,7 @@ function TrialBadge() {
 
 /* ─── OAuth Buttons ─── */
 function OAuthButtons({ mode }: { mode: AuthMode }) {
+  const t = useTranslations("auth");
   async function handleGoogleSignIn() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -1153,7 +1162,7 @@ function OAuthButtons({ mode }: { mode: AuthMode }) {
         className="flex items-center justify-center gap-[0.55rem] py-3 bg-white border-[1.5px] border-offwhite-dark rounded-lg text-[0.85rem] font-medium text-ink transition-all touch-manipulation active:scale-[0.98]"
       >
         <GoogleIcon />
-        Continue with Google
+        {t("continueWithGoogle")}
       </button>
     </div>
   );

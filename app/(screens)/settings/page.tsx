@@ -2,11 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuth } from "@/context/authProvider/provider";
+import { useLocale } from "@/context/localeProvider/provider";
+import { locales, localeLabels } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { session, isLoading, signOutUser, updateUserProfile } = useAuth();
+  const { locale, setLocale } = useLocale();
+  const t = useTranslations("settings");
+  const ta = useTranslations("auth");
+  const tc = useTranslations("common");
+  const th = useTranslations("header");
+  const tr = useTranslations("role");
+
   const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", dob: "" });
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState({ msg: "", ok: true });
@@ -28,8 +39,8 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (toast.msg) {
-      const t = setTimeout(() => setToast({ msg: "", ok: true }), 3000);
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => setToast({ msg: "", ok: true }), 3000);
+      return () => clearTimeout(timer);
     }
   }, [toast.msg]);
 
@@ -43,16 +54,16 @@ export default function SettingsPage() {
         : "U";
 
   const roleIcon = session.role === "owner" ? "👑" : session.role === "architect" ? "📐" : "🔧";
-  const roleLabel = session.role === "owner" ? "Owner" : session.role === "architect" ? "Architect" : "Contractor";
+  const roleLabel = tr(session.role);
 
   async function handleSave() {
     setIsSaving(true);
     try {
       const result = await updateUserProfile(form.firstName, form.lastName, form.phone, form.dob);
       if (result.success) {
-        setToast({ msg: "Profile updated successfully", ok: true });
+        setToast({ msg: t("profileUpdated"), ok: true });
       } else {
-        setToast({ msg: result.error || "Failed to update profile", ok: false });
+        setToast({ msg: result.error || t("updateFailed"), ok: false });
       }
     } finally {
       setIsSaving(false);
@@ -61,7 +72,6 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F5F2]">
-      {/* Header */}
       <header className="sticky top-0 z-100 bg-white border-b-2 border-[#E8601C] shadow-[0_2px_16px_rgba(232,96,28,0.08)] h-16 px-6 sm:px-8 flex items-center justify-between">
         <div className="font-serif text-[1.5rem] font-semibold tracking-[0.1em] text-[#E8601C]">
           ANANTAM<span className="text-[#2C2420] font-light"> · SITE</span>
@@ -70,14 +80,14 @@ export default function SettingsPage() {
           onClick={() => router.push("/dashboard")}
           className="flex items-center gap-1.5 text-[0.82rem] text-[#9C8E86] hover:text-[#E8601C] transition-colors cursor-pointer font-medium"
         >
-          ← Back to Dashboard
+          {tc("backToDashboard")}
         </button>
       </header>
 
       <div className="max-w-[760px] mx-auto px-6 sm:px-8 py-10">
         <div className="mb-8">
-          <div className="font-serif text-[2rem] font-semibold text-[#2C2420]">Profile Settings</div>
-          <div className="text-[0.84rem] text-[#9C8E86] mt-1">Manage your personal information and account preferences</div>
+          <div className="font-serif text-[2rem] font-semibold text-[#2C2420]">{t("title")}</div>
+          <div className="text-[0.84rem] text-[#9C8E86] mt-1">{t("subtitle")}</div>
         </div>
 
         {/* Avatar & Identity */}
@@ -98,43 +108,43 @@ export default function SettingsPage() {
         {/* Personal Information */}
         <div className="bg-white rounded-2xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden mb-5">
           <div className="px-6 py-4 border-b border-[#E2DAD1] bg-[#F7F5F2]">
-            <div className="font-semibold text-[0.88rem] text-[#2C2420] tracking-[0.02em]">Personal Information</div>
-            <div className="text-[0.72rem] text-[#9C8E86] mt-0.5">Update your name, phone number, and date of birth</div>
+            <div className="font-semibold text-[0.88rem] text-[#2C2420] tracking-[0.02em]">{t("personalInfo")}</div>
+            <div className="text-[0.72rem] text-[#9C8E86] mt-0.5">{t("personalInfoDesc")}</div>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">First Name</label>
+                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">{t("firstName")}</label>
                 <input
                   value={form.firstName}
                   onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                   className="w-full px-3.5 py-2.5 text-[0.84rem] bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-xl text-[#2C2420] outline-none focus:border-[#E8601C] focus:bg-white transition-all"
-                  placeholder="Enter first name"
+                  placeholder={t("firstNamePlaceholder")}
                 />
               </div>
               <div>
-                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">Last Name</label>
+                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">{t("lastName")}</label>
                 <input
                   value={form.lastName}
                   onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                   className="w-full px-3.5 py-2.5 text-[0.84rem] bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-xl text-[#2C2420] outline-none focus:border-[#E8601C] focus:bg-white transition-all"
-                  placeholder="Enter last name"
+                  placeholder={t("lastNamePlaceholder")}
                 />
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">Phone Number</label>
+                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">{t("phoneNumber")}</label>
                 <input
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                   type="tel"
                   className="w-full px-3.5 py-2.5 text-[0.84rem] bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-xl text-[#2C2420] outline-none focus:border-[#E8601C] focus:bg-white transition-all"
-                  placeholder="+91 98000 00000"
+                  placeholder={t("phonePlaceholder")}
                 />
               </div>
               <div>
-                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">Date of Birth</label>
+                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">{t("dob")}</label>
                 <input
                   type="date"
                   value={form.dob}
@@ -147,37 +157,67 @@ export default function SettingsPage() {
         </div>
 
         {/* Account Information */}
-        <div className="bg-white rounded-2xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden mb-8">
+        <div className="bg-white rounded-2xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden mb-5">
           <div className="px-6 py-4 border-b border-[#E2DAD1] bg-[#F7F5F2]">
-            <div className="font-semibold text-[0.88rem] text-[#2C2420] tracking-[0.02em]">Account Information</div>
-            <div className="text-[0.72rem] text-[#9C8E86] mt-0.5">These details are managed by your organization</div>
+            <div className="font-semibold text-[0.88rem] text-[#2C2420] tracking-[0.02em]">{t("accountInfo")}</div>
+            <div className="text-[0.72rem] text-[#9C8E86] mt-0.5">{t("accountInfoDesc")}</div>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">Email Address</label>
+                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">{t("emailAddress")}</label>
                 <div className="w-full px-3.5 py-2.5 text-[0.84rem] bg-[#F0EDE8] border-[1.5px] border-[#E2DAD1] rounded-xl text-[#9C8E86] cursor-not-allowed">
                   {session.email}
                 </div>
-                <div className="text-[0.68rem] text-[#B8AFA8] mt-1.5">Cannot be changed here</div>
+                <div className="text-[0.68rem] text-[#B8AFA8] mt-1.5">{t("cannotChange")}</div>
               </div>
               <div>
-                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">Role</label>
+                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">{t("role")}</label>
                 <div className="w-full px-3.5 py-2.5 text-[0.84rem] bg-[#F0EDE8] border-[1.5px] border-[#E2DAD1] rounded-xl text-[#9C8E86] flex items-center gap-2 cursor-not-allowed">
                   <span>{roleIcon}</span>
                   <span>{roleLabel}</span>
                 </div>
-                <div className="text-[0.68rem] text-[#B8AFA8] mt-1.5">Set by your organization</div>
+                <div className="text-[0.68rem] text-[#B8AFA8] mt-1.5">{t("setByOrg")}</div>
               </div>
             </div>
             {session.firmName && (
               <div className="mt-4">
-                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">Firm / Organization</label>
+                <label className="text-[0.72rem] text-[#9C8E86] tracking-[0.05em] uppercase font-medium block mb-1.5">{t("firmOrg")}</label>
                 <div className="w-full px-3.5 py-2.5 text-[0.84rem] bg-[#F0EDE8] border-[1.5px] border-[#E2DAD1] rounded-xl text-[#9C8E86] cursor-not-allowed">
                   {session.firmName}
                 </div>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Language & Region */}
+        <div className="bg-white rounded-2xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden mb-5">
+          <div className="px-6 py-4 border-b border-[#E2DAD1] bg-[#F7F5F2]">
+            <div className="font-semibold text-[0.88rem] text-[#2C2420] tracking-[0.02em]">{t("languageSection")}</div>
+            <div className="text-[0.72rem] text-[#9C8E86] mt-0.5">{t("languageSectionDesc")}</div>
+          </div>
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[0.88rem] font-medium text-[#2C2420]">{t("language")}</div>
+                <div className="text-[0.76rem] text-[#9C8E86] mt-0.5">{t("languageDesc")}</div>
+              </div>
+              <div className="relative">
+                <select
+                  value={locale}
+                  onChange={(e) => setLocale(e.target.value as Locale)}
+                  className="appearance-none bg-[#F7F5F2] border-[1.5px] border-[#E2DAD1] rounded-xl text-[0.84rem] text-[#2C2420] px-4 py-2.5 pr-10 outline-none focus:border-[#E8601C] focus:bg-white transition-all cursor-pointer"
+                >
+                  {locales.map((l) => (
+                    <option key={l} value={l}>
+                      {localeLabels[l]}
+                    </option>
+                  ))}
+                </select>
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#9C8E86] text-[0.6rem]">▾</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -188,26 +228,26 @@ export default function SettingsPage() {
             disabled={isSaving}
             className="bg-[#E8601C] text-white rounded-xl px-10 py-3 text-[0.88rem] font-semibold cursor-pointer transition-all hover:bg-[#C04E12] shadow-[0_4px_16px_rgba(232,96,28,0.25)] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isSaving ? "Saving…" : "Save Changes"}
+            {isSaving ? tc("saving") : tc("saveChanges")}
           </button>
         </div>
 
         {/* Account Actions */}
         <div className="bg-white rounded-2xl border border-[#E2DAD1] shadow-[0_2px_20px_rgba(44,36,32,0.07)] overflow-hidden">
           <div className="px-6 py-4 border-b border-[#E2DAD1] bg-[#F7F5F2]">
-            <div className="font-semibold text-[0.88rem] text-[#2C2420] tracking-[0.02em]">Account Actions</div>
+            <div className="font-semibold text-[0.88rem] text-[#2C2420] tracking-[0.02em]">{t("accountActions")}</div>
           </div>
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[0.88rem] font-medium text-[#2C2420]">Sign Out</div>
-                <div className="text-[0.76rem] text-[#9C8E86] mt-0.5">You will be redirected to the login page</div>
+                <div className="text-[0.88rem] font-medium text-[#2C2420]">{t("signOut")}</div>
+                <div className="text-[0.76rem] text-[#9C8E86] mt-0.5">{t("signOutDesc")}</div>
               </div>
               <button
                 onClick={async () => { await signOutUser(); router.push("/auth"); }}
                 className="bg-[#FDECEA] text-[#C0392B] border border-[#EDB9B9] rounded-xl px-5 py-2.5 text-[0.82rem] font-semibold cursor-pointer transition-all hover:bg-[#C0392B] hover:text-white"
               >
-                Sign Out
+                {th("signOut")}
               </button>
             </div>
           </div>

@@ -1,0 +1,349 @@
+{
+  "brand": {
+    "name": "ANANTAM · SITE",
+    "tagline": "Run every site like your best one.",
+    "subtitle": "Site management, on the ground."
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "backToDashboard": "← Back to Dashboard",
+    "skipForNow": "Skip for now",
+    "goToDashboard": "Go to dashboard →",
+    "saveChanges": "Save Changes",
+    "search": "Search",
+    "noResults": "No results found.",
+    "view": "View",
+    "download": "Download"
+  },
+  "nav": {
+    "tasks": "Task Sheets",
+    "comms": "Site Comms",
+    "drawings": "Drawings",
+    "actions": "Action Items",
+    "materials": "Materials",
+    "approvals": "Approvals",
+    "admin": "⚙ Admin"
+  },
+  "header": {
+    "signOut": "Sign Out",
+    "profileSettings": "Profile & Settings",
+    "quickEdit": "Quick Edit Profile",
+    "newProject": "New Project",
+    "overdue": "overdue"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Create account",
+    "alreadyAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Work email",
+    "phone": "Phone number",
+    "dob": "Date of Birth",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot password?",
+    "joinAs": "I'm joining as",
+    "firmName": "Firm / company name",
+    "signingIn": "Signing in...",
+    "creatingAccount": "Creating account...",
+    "owner": "Create workspace & start trial",
+    "architect": "Create account & start trial",
+    "contractor": "Create account & continue",
+    "terms": "By creating an account you agree to our",
+    "termsLink": "Terms",
+    "privacyLink": "Privacy policy",
+    "checkInbox": "Check your inbox.",
+    "verificationSent": "We sent a verification link to",
+    "verificationInstructions": "Click the link in the email to activate your account. Once confirmed, come back here and sign in.",
+    "goToSignIn": "Go to sign in →",
+    "wrongEmail": "Wrong email?",
+    "startOver": "Start over",
+    "welcomeBack": "Welcome back.",
+    "signInToWorkspace": "Sign in to your workspace.",
+    "continueWithGoogle": "Continue with Google",
+    "or": "or",
+    "invited": "You've been invited",
+    "setPassword": "Set your password to get started.",
+    "accountReady": "Your account is ready. Set a password so you can sign in anytime.",
+    "newPassword": "New password",
+    "passwordPlaceholder": "Min. 8 characters",
+    "confirmPasswordPlaceholder": "Confirm password",
+    "settingPassword": "Setting password...",
+    "setPasswordContinue": "Set password & continue →",
+    "oneMoreStep": "One more step",
+    "completeProfile": "Complete your profile.",
+    "profileHelp": "Help your team know who you are. You can update this anytime from settings.",
+    "phoneOptional": "(optional)",
+    "savingProfile": "Saving...",
+    "saveAndGo": "Save & go to dashboard →",
+    "allSet": "You're all set.",
+    "passwordSaved": "Your password has been saved. You can now sign in anytime with your email and password.",
+    "forgotYourPassword": "Forgot your password?",
+    "enterEmailReset": "Enter your email and we'll send you a reset link.",
+    "sendResetLink": "Send reset link",
+    "sending": "Sending...",
+    "resetPassword": "Reset your password",
+    "setNewPassword": "Set a new password.",
+    "chooseStrongPassword": "Choose a strong password for your account.",
+    "saveNewPassword": "Save new password →",
+    "passwordUpdated": "Password updated.",
+    "passwordUpdatedMsg": "Your new password is saved. You're signed in and ready to go.",
+    "backToSignIn": "Back to sign in",
+    "emailSent": "If an account exists for that email, we've sent a password reset link. It expires in 1 hour.",
+    "inviteLinkExpired": "This invite link may have expired or already been used.",
+    "inviteUnavailable": "Invite unavailable",
+    "acceptingInvite": "Accepting invite...",
+    "pleaseWait": "Please wait while we add you to the workspace.",
+    "errorPrefix": "Failed to process invitation. Please contact your admin.",
+    "invalidInviteLink": "Invalid invite link. No token found.",
+    "failedAccept": "Failed to accept invitation."
+  },
+  "settings": {
+    "title": "Profile Settings",
+    "subtitle": "Manage your personal information and account preferences",
+    "personalInfo": "Personal Information",
+    "personalInfoDesc": "Update your name, phone number, and date of birth",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "Enter first name",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter last name",
+    "phoneNumber": "Phone Number",
+    "phonePlaceholder": "+91 98000 00000",
+    "dob": "Date of Birth",
+    "accountInfo": "Account Information",
+    "accountInfoDesc": "These details are managed by your organization",
+    "emailAddress": "Email Address",
+    "cannotChange": "Cannot be changed here",
+    "role": "Role",
+    "setByOrg": "Set by your organization",
+    "firmOrg": "Firm / Organization",
+    "accountActions": "Account Actions",
+    "signOut": "Sign Out",
+    "signOutDesc": "You will be redirected to the login page",
+    "profileUpdated": "Profile updated successfully",
+    "updateFailed": "Failed to update profile",
+    "language": "Language",
+    "languageDesc": "Choose your preferred language",
+    "languageSection": "Language & Region",
+    "languageSectionDesc": "Select the language used throughout the app"
+  },
+  "dashboard": {
+    "taskSheet": {
+      "title": "Daily Task Sheets",
+      "subtitle": "Filter by unit · Add & track tasks",
+      "kpis": {
+        "total": "Total Tasks",
+        "done": "Done",
+        "inProgress": "In Progress",
+        "pendingDelayed": "Pending / Delayed"
+      },
+      "views": {
+        "all": "📋 All Tasks",
+        "byRoom": "🏠 By Room"
+      },
+      "tableHeaders": {
+        "task": "Task",
+        "unit": "Unit",
+        "room": "Room",
+        "assignee": "Assignee",
+        "start": "Start",
+        "end": "End",
+        "status": "Status",
+        "action": "Action"
+      },
+      "empty": "No tasks found. Add one to get started.",
+      "addTask": "+ Add Task",
+      "newTask": "New Task",
+      "editTask": "Edit Task",
+      "desc": "Description *",
+      "room": "Room",
+      "assignee": "Assignee",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "notes": "Delay Notes",
+      "saveTask": "Save Task"
+    },
+    "approvals": {
+      "title": "Approvals Log",
+      "subtitle": "Client sign-offs · MEP consultant approvals · Design decisions",
+      "kpis": {
+        "total": "Total",
+        "approved": "Approved",
+        "pending": "Pending",
+        "revisionRejected": "Revision / Rejected"
+      },
+      "filters": {
+        "type": "Type",
+        "status": "Status",
+        "unit": "Unit"
+      },
+      "card": {
+        "submitted": "Submitted:",
+        "responded": "Responded:",
+        "awaiting": "Awaiting",
+        "loggedBy": "Logged by"
+      },
+      "empty": "No approvals match your filters.",
+      "addApproval": "+ Log Approval",
+      "editApproval": "Edit Approval"
+    },
+    "materials": {
+      "title": "Material Tracker",
+      "subtitle": "Log procurement status · Track deliveries · Link to rooms",
+      "kpis": {
+        "total": "Total Items",
+        "delivered": "Delivered",
+        "ordered": "Ordered / In Transit",
+        "pending": "Pending Order"
+      },
+      "filters": {
+        "status": "Status",
+        "unit": "Unit",
+        "category": "Category"
+      },
+      "tableHeaders": {
+        "item": "Item",
+        "category": "Category",
+        "unitRoom": "Unit / Room",
+        "vendor": "Vendor",
+        "qty": "Qty",
+        "orderDate": "Order Date",
+        "eta": "ETA",
+        "status": "Status"
+      },
+      "empty": "No materials logged yet.",
+      "addMaterial": "+ Add Material",
+      "addItem": "Add Material / Item",
+      "editItem": "Edit Material"
+    },
+    "drawings": {
+      "title": "Drawings & Documents",
+      "subtitle": "Upload GFC drawings · Assign to rooms · Download anytime",
+      "upload": "Drop PDFs or click to upload",
+      "uploadHint": "Supports PDF, DWG references, images · Max 50MB per file",
+      "empty": "No drawings uploaded yet.",
+      "filters": {
+        "type": "Type"
+      }
+    },
+    "actions": {
+      "title": "Action Items",
+      "subtitle": "Daily reminders · Site snags · Everything that needs attention",
+      "tabs": {
+        "reminders": "🔔 Reminders",
+        "snags": "🚧 Snags"
+      },
+      "reminders": {
+        "header": "Today's Task Reminders",
+        "empty": "No reminders for today 🎉"
+      },
+      "snags": {
+        "kpis": {
+          "total": "Total Snags",
+          "open": "Open",
+          "inRectification": "In Rectification",
+          "signedOff": "Signed Off"
+        },
+        "filters": {
+          "severity": "Severity",
+          "status": "Status"
+        },
+        "empty": "No snags logged. All clear! ✅",
+        "logDefect": "+ Log Defect",
+        "logDefectTitle": "Log Defect / Snag",
+        "raisedBy": "Raised by",
+        "onDate": "on",
+        "assignedTo": "Assigned to",
+        "target": "Target"
+      },
+      "send": "Send"
+    },
+    "comms": {
+      "title": "Site Communications",
+      "subtitle": "Room channels · Photo sharing · Announcements",
+      "channels": "Channels",
+      "online": "online",
+      "empty": "No messages yet. Start the conversation.",
+      "today": "Today",
+      "messagePlaceholder": "Type a message..."
+    },
+    "overview": {
+      "title": "Weekly Overview",
+      "subtitle": "KPIs, flags, and progress at a glance",
+      "kpis": {
+        "totalTasks": "Total Tasks",
+        "done": "Done",
+        "inProgress": "In Progress",
+        "pending": "Pending",
+        "delayed": "Delayed"
+      },
+      "overdue": "🚩 Overdue Tasks",
+      "unitProgress": "Unit Progress",
+      "assigneeWorkload": "Assignee Workload",
+      "tasksCount": "tasks",
+      "active": "active"
+    }
+  },
+  "status": {
+    "task": {
+      "Pending": "Pending",
+      "In Progress": "In Progress",
+      "Done": "Done",
+      "Delayed": "Delayed"
+    },
+    "material": {
+      "Pending Order": "Pending Order",
+      "Ordered": "Ordered",
+      "Delivered": "Delivered",
+      "On Hold": "On Hold"
+    },
+    "approval": {
+      "Pending": "Pending",
+      "Approved": "Approved",
+      "Rejected": "Rejected",
+      "Revision Required": "Revision Required"
+    },
+    "snagSeverity": {
+      "Critical": "Critical",
+      "Major": "Major",
+      "Minor": "Minor"
+    },
+    "snagStatus": {
+      "Open": "Open",
+      "In Rectification": "In Rectification",
+      "Rectified": "Rectified",
+      "Signed Off": "Signed Off"
+    },
+    "notePriority": {
+      "high": "High",
+      "medium": "Medium",
+      "info": "Info"
+    }
+  },
+  "role": {
+    "owner": "Owner",
+    "architect": "Architect",
+    "contractor": "Contractor"
+  },
+  "toast": {
+    "taskAdded": "Task added",
+    "taskDeleted": "Task deleted",
+    "taskUpdated": "Task updated",
+    "materialAdded": "Material added",
+    "materialUpdated": "Material updated",
+    "materialRemoved": "Material removed",
+    "approvalLogged": "Approval logged",
+    "approvalUpdated": "Approval updated",
+    "approvalRemoved": "Approval removed",
+    "snagLogged": "Snag logged",
+    "profileUpdated": "Profile updated",
+    "projectSwitched": "Switched to"
+  }
+}
