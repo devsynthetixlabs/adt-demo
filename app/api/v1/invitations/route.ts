@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
   // Derive the callback URL from the incoming request so it works in every
   // environment (local, preview, production) without extra env vars.
-  const origin = new URL(request.url).origin;
+  const origin = process.env.NEXT_PUBLIC_APP_URL || new URL(request.url).origin;
   const redirectTo = `${origin}/auth/callback?type=invite`;
 
   // Supabase sends the invite email automatically. The user_metadata we pass
